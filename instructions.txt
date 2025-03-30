@@ -1,0 +1,206 @@
+PERSONNELLE:
+Nom de l'app: Webify
+logo: est dans public sous le nom webifyLogo.png
+phrase accrocheuse: Votre vision, notre création
+la couleur phare de l'app: celle de mon logo (webifyLogo)
+image par defaut: ./images/default-image.svg
+
+PRESENTATION DE MON PROJET:
+C'est un projet NextJs (frontend) + Convex (backend) + Tailwind et TypeScript.
+Les methodes et templates et sites et libraries à utiliser sont precisé en bas.
+Mon app aura 3 compartiments ou roles: les users (user), les collaborateurs (colab) et l'administrateur (admin).
+NB: Il n'est pas nécessaire de se connecter pour voir les pages de Home, About, Projects, Skills, Blog, Contact. Tout le monde a acces à ces pages
+A quoi sert donc le login ?, il est impossible de csoummetre le formulaire de contact (dans la page de contact ou ailleurs) sans etre connecté lorsque l'utilisateur se connecte, il accede à plusieurs privilege:
+en tant que "user": il a acces à sa page de profile où il peut modifier sa photo, son nom et autre information, voir les postes qu'il a enregistré, liké ou partagé et ses stats (par rapport aux commentaires, likes, partage qu'il a pu effectuer dans l'application et c'est là où il pourra aussi supprimer son compte).
+il aura aussi acces à la page de messagerie, où il pourra discuter avec les diffrents collaborateurs visibles sur la plateform, les autres utilisateurs, creer ou rejoindre des groupes de discussions, demander et recevoir des demandes d'amitie(lorsqu'ils sont amis, les 2 utilisateurs peuvent voir leur contact affiche de maniere permanante dans une page pour lancer rapidement la discussion).
+en tant que "colab": il a les memes acces que les "user" normaux mais il a la permission de faire des postes qui seront vu dans la d'accueil et les modifiers(uniquement si ce sont les siens) ou les supprimer(uniquement si ce sont les siens), poster des projects réalisés dans la page projects et pouvoir, les modifiers ou supprimer(uniquement si ce sont les siens) et voir dans sa page de profil des stats aussi par rapport aux postes aimés, partagé et comenté pour voir comment evolue sa notoriété et avoir des astuces pour faires des meilleures postes et à quelle fréquence. le collaborateur se voit afficher avec son nom, un badge de certification, qui ne sera autre que le logo de l'application, qui attestera qu'il est bien membre collaborateur de l'application.
+en tant que "admin": il a les memes privileges que le "user" et le "colab" et en plus il a une page de dashboard où il voit tout ce qui se passe dans l'application, les stats concernants toutes les interactions des utilisateurs(user comme colab) lui sont affiché par utilisateur, puis de facon global il a toutes les stats necessaires pour voir la tendance de son application (combien de personnes visite le site et combien de fois par, semaine, mois ou annee. la moyenne des likes sur un post, de commentaires, voir quel est le postes ou projet le plus apprecié durant la journée, la semaine, le mois ou l'année et autres stats importantes pour le suivies de l'application), les stats concernant le "user" le plus actif, le colab le plus perfomants en raison de la forte affluence des utilisateurs sur ses postes, tec... dans son dashboard il peut aussi manager les utilisateurs comme les collaborateurs(supprimer leurs comptes, modifier leurs roles et permissions) et voir les performances par utilisateurs(user comme collab), par user uniquement, par collab uniquement ou pur chaque utilisateur en particuliers.
+l'administrateur peut faire des postes et des modifications sur toutes les pages de l'application sans distinctions, que ce soit ses postes ou pas. il a aussi un badge à coté de son nom mais ce sera ecrit "admin".
+
+
+
+Voici les pages essentielles à inclure et ce que tu devrais y mettre :
+---
+1. Page d'accueil (Home)
+But : Faire une bonne première impression.
+Contenu :
+Un titre accrocheur (ex. : "Salut, moi c’est Charles, développeur web full stack passionné").
+Un court résumé de ton expertise et de ton objectif professionnel.
+Un bouton CTA (Call to Action) menant vers la section "Projets".
+Une image ou animation (par exemple un avatar, une photo pro, ou une animation sur ma photo avec Three.js).
+une section pour afficher les cartes de mes diffrents collaborateurs, avec la Possibilité de laisser un like sur celui ci et un message(le message renvoi à la page de messagerie qui n'est accessible qu'une fois inscrit)
+une section pour les avis des utilisateurs(il faut etre connecte pour laisser un avis), il peut laisser un avis sur un colab en particulier ou sur l'admin(avis qui s'affichera sur la page d'accueil mais aussi dans le profil des deux utilisateurs) ou laisser un avis sur l'application en generale.
+un footer
+---
+2. À propos (About)
+But : Montrer qui tu es en dehors des projets.
+Contenu :
+Une présentation de toi : ton parcours, tes motivations, pourquoi tu fais du développement web.
+Tes compétences techniques : liste des technologies que tu maîtrises (React, Next.js, Convex, Tailwind, etc.).
+Tes soft skills : travail en équipe, gestion de projet, autonomie, etc.
+Une photo de toi pour donner un côté humain à ton portfolio.
+Un lien vers ton CV en PDF ou format photo.(si fournie)
+NB: cette partie presente aussi les autres collaborateurs, chacun a un max de 4 photos qu'il peut afficher dans cette page.(chacun en tant que "collab" ou "admin" pourra modifier sa presentation et ses photos)
+---
+3. Projets (Projects)
+But : Mettre en avant tes réalisations.
+Contenu :
+Une liste de projets avec :
+Nom du projet
+Image / capture d’écran
+Description courte (objectif du projet, technologies utilisées)
+Lien vers le code (GitHub)
+Lien vers la démo en ligne (Vercel, Netlify, etc.)
+Option : Filtrer par catégorie (solo, collaboration, perso, pro).
+NB: dans cette page les "colab" et "admin" pourront ajouter leurs differents projets(2 photos max et une courte video). les "user" auront la possibilité de liker et de commenter les projets.
+---
+4. Compétences (Skills)
+But : Détailler tes compétences techniques.
+Contenu :
+Une liste des langages, frameworks et outils que tu maîtrises.
+Un niveau d’expertise (débutant, intermédiaire, expert) pour chaque compétence.
+Possibilité d’ajouter des certifications ou des formations suivies.
+chaque "colab" ou "admin" pourra modifier ses skills à sa guise
+---
+5. Blog
+But : Montrer ton expertise en partageant des articles techniques.
+Contenu :
+Des articles sur des sujets qui t’intéressent (React, Next.js, Convex, CI/CD, astuces de développement…).
+Un tutoriel ou retour d’expérience sur un projet spécifique.
+NB: "colab" et "admin" pourront partager des blogs. les "user" pouront liker, commenter, enregister et/ou partager
+---
+6. Contact
+But : Permettre aux recruteurs ou collaborateurs de te contacter.
+Contenu :
+Un formulaire de contact (Nom, Email, Message).
+Tes réseaux sociaux (LinkedIn, GitHub, Twitter).
+Ton adresse email (protégée contre les bots).
+NB: il faut etre connecte pour soummetre le formulaire de contact. il sera possible de choisir quel collaborateur tu veux contacter(les informations concernant chaque utilisateur seront donc fournie, parlant de ses Tes réseaux sociaux), sinon par defaut ce sera l'admin.
+---
+7. Authentification
+implementer un login et un register, avec google et email. la possibilite de reinitialiser le mot de passe grace une code a 6 chiffre envoye a l'email de l'utilisateur.
+NB: le role par defaut est "user".
+---
+8. Profile
+---
+9. Messagerie
+
+NB: pour les designs et les interfaces sert toi des indications à la suite et n'hesite pas à ajouter les parties que jugent importantes et que j'ai oubliée de marquer.
+
+
+Bonus : Quelques conseils
+Responsive design : Assure-toi que ton site est bien affiché sur mobile.
+Performance & SEO : Optimise les images, utilise des meta tags pour le référencement.
+Design soigné : Un portfolio bien présenté est plus attractif (tu peux utiliser Tailwind et Framer Motion).
+Accessibilité : Ajoute du texte alternatif aux images et utilise un contraste suffisant pour le texte.
+
+
+DESIGN:
+Pour un design futuriste et unique, voici ce que je te conseille :
+---
+1. Inspirations et direction artistique
+Un style futuriste peut inclure :
+Néon & Cyberpunk : Couleurs vibrantes, contrastes élevés (bleu, violet, rose).
+Minimalisme High-Tech : Interfaces épurées, animations subtiles.
+Glassmorphism : Effet de verre translucide avec des reflets.
+3D & Effets dynamiques : Particules interactives, animations fluides.
+
+Tu peux t’inspirer de sites comme :
+https://aerolab.co/
+https://framer.com/
+https://www.awwwards.com/
+---
+2. Technologies à utiliser
+Framer Motion pour des animations fluides.
+Three.js pour des effets 3D interactifs.
+GSAP pour des animations ultra précises.
+Shaders (GLSL) pour des effets avancés (lumières, distorsions).
+Tailwind + Radix UI pour un style propre et dynamique
+Effet de particules interactives
+Ajoute react-tsparticles :
+npm install react-tsparticles
+Ajoute <ParticleBackground /> en arrière-plan de ton site.
+---
+7. Typographie et couleurs futuristes
+Ajoute une police moderne :
+import "@fontsource/orbitron"; // Installe avec npm install @fontsource/orbitron
+
+GESTIONS DES IMAGES:
+Meilleure approche : Stocker les images sur uploadThing et enregistrer les URLs dans Convex
+1. Uploader les images sur uploadThing via leur API.
+2. Stocker l'URL de l'image dans Convex.
+
+OPTIMISATION DES PERFORMANCES:
+1. Performance : Une application ultra rapide
+Pour une rapidité maximale, voici les techniques à utiliser :
+🔹 Next.js avec Server Components et Suspense
+Server Components pour ne charger que ce qui est nécessaire.
+React Suspense pour afficher un squelette de page avant que les données ne soient chargées.
+Streaming pour afficher les parties les plus rapides en premier.
+---
+🔹 Optimisation du chargement des pages
+Prefetching avec Next.js (next/link et next/script)
+Cache et revalidation avec getServerSideProps ou revalidateTag
+Lazy Loading intelligent : Charger uniquement ce qui est visible avec Intersection Observer.
+---
+💬 2. Messagerie instantanée
+🔹 Stack recommandée
+Convex pour la gestion en temps réel (database + backend serverless).
+React TanStack Query pour mettre à jour l’UI instantanément.
+WebSockets avec Convex pour du vrai temps réel.
+---
+🏆 3. Authentification et Profils Dynamiques
+🔹 Auth avec NextAuth.js + Convex
+Connexion avec Google, Email.
+Gestion des rôles et permissions dans Convex.
+🔹 Profils Utilisateurs
+Chaque utilisateur a sa propre page dynamique : /user/[id]
+Stocker les infos utilisateur (nom, photo, bio) dans Convex.
+---
+📸 4. Ajouter des posts et des photos de profil
+🔹 Upload d’images avec uploadThing
+L’utilisateur peut uploader une photo de profil et des posts avec images.
+L’URL de l’image est stockée dans Convex.
+---
+🎨 5. Expérience utilisateur futuriste
+🔹 Effets visuels avancés
+Framer Motion pour les transitions fluides 
+---
+🔥 6. Déploiement ultra performant
+🔹 Next.js (Frontend)
+Hébergé sur Vercel (optimisé pour Next.js).
+CDN et edge functions pour charger les pages en un instant.
+🔹 Convex (Backend)
+Hébergé sur Convex Cloud (temps réel et optimisé).
+
+
+[21:49, 28/03/2025] CHARLES・LOUISIN 🙂🪶:  Organisation des dossiers avec Next.js et Convex
+
+Voici une structure optimisée :
+
+/mon-projet
+│── /app (ou /pages)       -> Frontend Next.js (routes, UI)
+│── /components            -> Composants réutilisables
+│── /convex                -> Backend Convex (fonctions serverless)
+│   ├── functions.ts       -> Fonctions backend (mutations, queries)
+│   ├── schema.ts          -> Définition du schéma de la base de données
+│   ├── auth.ts            -> Gestion de l’authentification
+│   ├── messages.ts        -> Fonctions pour la messagerie instantanée
+│   ├── users.ts           -> Gestion des utilisateurs
+│   ├── posts.ts           -> Gestion des posts
+│── /lib                   -> Fonctions utilitaires (fetch, formattage)
+│── /styles                -> Styles globaux et Tailwind
+│── /public                -> Images et assets statiques
+│── /api                   -> Routes API pour uploader des fichiers (ex: uploadThing)
+│── convex.json            -> Config Convex
+│── package.json           -> Dépendances
+│── tsconfig.json          -> Config TypeScript
+│── .env.local             -> Variables d’environnement
+---
+Un dossier /convex dédié au backend et /app pour le frontend.
+
+
+Réduire la bande passante :
+Compresser les images avant de les uploader.
+Utiliser des formats modernes pour réduire la taille des fichiers.
+Utiliser un CDN pour stocker certaines images en cache.
