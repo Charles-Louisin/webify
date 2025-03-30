@@ -110,4 +110,29 @@ export const updateUserRole = mutation({
     await ctx.db.patch(args.userId, { role: args.newRole });
     return true;
   },
-}); 
+});
+
+// Fonctions utilitaires pour la vérification des permissions
+export const checkUserExists = async (ctx: any, userId: Id<"users">) => {
+  const user = await ctx.db.get(userId);
+  if (!user) {
+    throw new Error("Utilisateur non trouvé");
+  }
+  return user;
+};
+
+export const checkIsColab = async (ctx: any, userId: Id<"users">) => {
+  const user = await checkUserExists(ctx, userId);
+  if (user.role !== "colab" && user.role !== "admin") {
+    throw new Error("Permission refusée - Action réservée aux collaborateurs et administrateurs");
+  }
+  return user;
+};
+
+export const checkIsAdmin = async (ctx: any, userId: Id<"users">) => {
+  const user = await checkUserExists(ctx, userId);
+  if (user.role !== "admin") {
+    throw new Error("Permission refusée - Action réservée aux administrateurs");
+  }
+  return user;
+}; 

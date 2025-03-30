@@ -1,21 +1,13 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
-
-// Vérifier si un utilisateur est admin
-const isAdmin = async (ctx: any, userId: Id<"users">) => {
-  const user = await ctx.db.get(userId);
-  if (!user || user.role !== "admin") {
-    throw new Error("Permission refusée - Action réservée aux administrateurs");
-  }
-  return user;
-};
+import { checkIsAdmin } from "./auth";
 
 // Obtenir les statistiques globales
 export const getGlobalStats = query({
   args: { adminId: v.id("users") },
   handler: async (ctx, args) => {
-    await isAdmin(ctx, args.adminId);
+    await checkIsAdmin(ctx, args.adminId);
 
     // Récupérer tous les utilisateurs
     const users = await ctx.db.query("users").collect();
@@ -90,7 +82,7 @@ export const getUserStats = query({
     targetUserId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    await isAdmin(ctx, args.adminId);
+    await checkIsAdmin(ctx, args.adminId);
 
     const user = await ctx.db.get(args.targetUserId);
     if (!user) {
@@ -177,7 +169,7 @@ export const getMostActiveUsers = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await isAdmin(ctx, args.adminId);
+    await checkIsAdmin(ctx, args.adminId);
 
     const users = await ctx.db.query("users").collect();
 
@@ -233,7 +225,7 @@ export const getTopCollaborators = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await isAdmin(ctx, args.adminId);
+    await checkIsAdmin(ctx, args.adminId);
 
     const colabs = await ctx.db
       .query("users")
