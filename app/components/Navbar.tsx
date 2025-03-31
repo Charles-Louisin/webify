@@ -61,11 +61,11 @@ const routes = [
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { user, isSignedIn } = useUser();
+  const { user, session } = useUser();
   const [open, setOpen] = useState(false);
 
-  const isAdmin = user?.role === "admin";
-  const isAuthenticated = isSignedIn;
+  const isAdmin = session?.user.role === "admin";
+  const isAuthenticated = session;
 
   return (
     <div className="fixed w-full h-fit z-50 flex justify-between items-center py-2 px-4 border-b border-primary/10 bg-secondary">

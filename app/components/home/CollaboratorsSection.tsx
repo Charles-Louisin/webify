@@ -34,11 +34,11 @@ interface CollaboratorsSectionProps {
 
 export default function CollaboratorsSection({ collaborators }: CollaboratorsSectionProps) {
   const router = useRouter();
-  const { user, isSignedIn } = useUser();
+  const { user, session } = useUser();
   const likeProfile = useMutation(api.users.likeProfile);
 
   const handleLike = async (collaboratorId: Id<"users">) => {
-    if (!isSignedIn || !user) {
+    if (!session || !user) {
       toast.error("Connectez-vous pour aimer un profil");
       return;
     }
@@ -52,7 +52,7 @@ export default function CollaboratorsSection({ collaborators }: CollaboratorsSec
   };
 
   const handleMessage = (collaboratorId: string) => {
-    if (!isSignedIn) {
+    if (!session) {
       toast.error("Connectez-vous pour envoyer un message");
       return;
     }

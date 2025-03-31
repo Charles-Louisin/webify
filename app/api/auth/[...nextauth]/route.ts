@@ -1,7 +1,5 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { ConvexClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
 
 declare module "next-auth" {
   interface Session {
@@ -18,8 +16,6 @@ declare module "next-auth" {
   }
 }
 
-const convex = new ConvexClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 const handler = NextAuth({
   providers: [
     GoogleProvider({
@@ -35,17 +31,7 @@ const handler = NextAuth({
   },
   callbacks: {
     async signIn({ user }) {
-      if (user.email && user.name) {
-        try {
-          await convex.mutation(api.auth.createUser, {
-            name: user.name,
-            email: user.email,
-            image: user.image || undefined,
-          });
-        } catch (error) {
-          console.error("Error creating user in Convex:", error);
-        }
-      }
+      // La création de l'utilisateur sera gérée côté client après la connexion réussie
       return true;
     },
     async session({ session, token }) {

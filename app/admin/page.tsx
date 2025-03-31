@@ -19,7 +19,7 @@ import GlobalStats from "./components/GlobalStats";
 import Settings from "./components/Settings";
 
 export default function AdminDashboard() {
-  const { user, isLoading } = useUser();
+  const { user, session } = useUser();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -30,12 +30,12 @@ export default function AdminDashboard() {
   );
 
   // Rediriger si l'utilisateur n'est pas administrateur
-  if (!isLoading && (!user || user.role !== "admin")) {
+  if (!session || session.user.role !== "admin") {
     router.push("/");
     return null;
   }
 
-  if (isLoading) {
+  if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
