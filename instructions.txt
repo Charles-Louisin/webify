@@ -3,7 +3,7 @@ Nom de l'app: Webify
 logo: est dans public sous le nom webifyLogo.png
 phrase accrocheuse: Votre vision, notre création
 la couleur phare de l'app: celle de mon logo (webifyLogo)
-image par defaut: ./images/default-image.svg
+image par defaut: ./img1.jpg
 
 PRESENTATION DE MON PROJET:
 C'est un projet NextJs (frontend) + Convex (backend) + Tailwind et TypeScript.
@@ -13,7 +13,7 @@ NB: Il n'est pas nécessaire de se connecter pour voir les pages de Home, About,
 A quoi sert donc le login ?, il est impossible de csoummetre le formulaire de contact (dans la page de contact ou ailleurs) sans etre connecté lorsque l'utilisateur se connecte, il accede à plusieurs privilege:
 en tant que "user": il a acces à sa page de profile où il peut modifier sa photo, son nom et autre information, voir les postes qu'il a enregistré, liké ou partagé et ses stats (par rapport aux commentaires, likes, partage qu'il a pu effectuer dans l'application et c'est là où il pourra aussi supprimer son compte).
 il aura aussi acces à la page de messagerie, où il pourra discuter avec les diffrents collaborateurs visibles sur la plateform, les autres utilisateurs, creer ou rejoindre des groupes de discussions, demander et recevoir des demandes d'amitie(lorsqu'ils sont amis, les 2 utilisateurs peuvent voir leur contact affiche de maniere permanante dans une page pour lancer rapidement la discussion).
-en tant que "colab": il a les memes acces que les "user" normaux mais il a la permission de faire des postes qui seront vu dans la d'accueil et les modifiers(uniquement si ce sont les siens) ou les supprimer(uniquement si ce sont les siens), poster des projects réalisés dans la page projects et pouvoir, les modifiers ou supprimer(uniquement si ce sont les siens) et voir dans sa page de profil des stats aussi par rapport aux postes aimés, partagé et comenté pour voir comment evolue sa notoriété et avoir des astuces pour faires des meilleures postes et à quelle fréquence. le collaborateur se voit afficher avec son nom, un badge de certification, qui ne sera autre que le logo de l'application, qui attestera qu'il est bien membre collaborateur de l'application.
+en tant que "colab": il a les memes acces que les "user" normaux mais il a la permission de faire des postes qui seront vu dans la page d'accueil et les modifiers(uniquement si ce sont les siens) ou les supprimer(uniquement si ce sont les siens), poster des projects réalisés dans la page projects et pouvoir les modifiers ou supprimer(uniquement si ce sont les siens) et voir dans sa page de profil des stats aussi par rapport aux postes aimés, partagé et comenté pour voir comment evolue sa notoriété et avoir des astuces pour faires des meilleures postes et à quelle fréquence. le collaborateur se voit afficher avec son nom, un badge de certification, qui ne sera autre que le logo de l'application, qui attestera qu'il est bien membre collaborateur de l'application.
 en tant que "admin": il a les memes privileges que le "user" et le "colab" et en plus il a une page de dashboard où il voit tout ce qui se passe dans l'application, les stats concernants toutes les interactions des utilisateurs(user comme colab) lui sont affiché par utilisateur, puis de facon global il a toutes les stats necessaires pour voir la tendance de son application (combien de personnes visite le site et combien de fois par, semaine, mois ou annee. la moyenne des likes sur un post, de commentaires, voir quel est le postes ou projet le plus apprecié durant la journée, la semaine, le mois ou l'année et autres stats importantes pour le suivies de l'application), les stats concernant le "user" le plus actif, le colab le plus perfomants en raison de la forte affluence des utilisateurs sur ses postes, tec... dans son dashboard il peut aussi manager les utilisateurs comme les collaborateurs(supprimer leurs comptes, modifier leurs roles et permissions) et voir les performances par utilisateurs(user comme collab), par user uniquement, par collab uniquement ou pur chaque utilisateur en particuliers.
 l'administrateur peut faire des postes et des modifications sur toutes les pages de l'application sans distinctions, que ce soit ses postes ou pas. il a aussi un badge à coté de son nom mais ce sera ecrit "admin".
 
@@ -24,7 +24,7 @@ Voici les pages essentielles à inclure et ce que tu devrais y mettre :
 1. Page d'accueil (Home)
 But : Faire une bonne première impression.
 Contenu :
-Un titre accrocheur (ex. : "Salut, moi c’est Charles, développeur web full stack passionné").
+Un titre accrocheur (ex. : "Salut, moi c'est Charles, développeur web full stack passionné").
 Un court résumé de ton expertise et de ton objectif professionnel.
 Un bouton CTA (Call to Action) menant vers la section "Projets".
 Une image ou animation (par exemple un avatar, une photo pro, ou une animation sur ma photo avec Three.js).
@@ -47,7 +47,7 @@ But : Mettre en avant tes réalisations.
 Contenu :
 Une liste de projets avec :
 Nom du projet
-Image / capture d’écran
+Image / capture d'écran
 Description courte (objectif du projet, technologies utilisées)
 Lien vers le code (GitHub)
 Lien vers la démo en ligne (Vercel, Netlify, etc.)
@@ -58,15 +58,15 @@ NB: dans cette page les "colab" et "admin" pourront ajouter leurs differents pro
 But : Détailler tes compétences techniques.
 Contenu :
 Une liste des langages, frameworks et outils que tu maîtrises.
-Un niveau d’expertise (débutant, intermédiaire, expert) pour chaque compétence.
-Possibilité d’ajouter des certifications ou des formations suivies.
+Un niveau d'expertise (débutant, intermédiaire, expert) pour chaque compétence.
+Possibilité d'ajouter des certifications ou des formations suivies.
 chaque "colab" ou "admin" pourra modifier ses skills à sa guise
 ---
 5. Blog
 But : Montrer ton expertise en partageant des articles techniques.
 Contenu :
-Des articles sur des sujets qui t’intéressent (React, Next.js, Convex, CI/CD, astuces de développement…).
-Un tutoriel ou retour d’expérience sur un projet spécifique.
+Des articles sur des sujets qui t'intéressent (React, Next.js, Convex, CI/CD, astuces de développement…).
+Un tutoriel ou retour d'expérience sur un projet spécifique.
 NB: "colab" et "admin" pourront partager des blogs. les "user" pouront liker, commenter, enregister et/ou partager
 ---
 6. Contact
@@ -105,7 +105,7 @@ Minimalisme High-Tech : Interfaces épurées, animations subtiles.
 Glassmorphism : Effet de verre translucide avec des reflets.
 3D & Effets dynamiques : Particules interactives, animations fluides.
 
-Tu peux t’inspirer de sites comme :
+Tu peux t'inspirer de sites comme :
 https://aerolab.co/
 https://framer.com/
 https://www.awwwards.com/
@@ -146,7 +146,7 @@ Lazy Loading intelligent : Charger uniquement ce qui est visible avec Intersecti
 💬 2. Messagerie instantanée
 🔹 Stack recommandée
 Convex pour la gestion en temps réel (database + backend serverless).
-React TanStack Query pour mettre à jour l’UI instantanément.
+React TanStack Query pour mettre à jour l'UI instantanément.
 WebSockets avec Convex pour du vrai temps réel.
 ---
 🏆 3. Authentification et Profils Dynamiques
@@ -158,11 +158,11 @@ Chaque utilisateur a sa propre page dynamique : /user/[id]
 Stocker les infos utilisateur (nom, photo, bio) dans Convex.
 ---
 📸 4. Ajouter des posts et des photos de profil
-🔹 Upload d’images avec uploadThing
-L’utilisateur peut uploader une photo de profil et des posts avec images.
-L’URL de l’image est stockée dans Convex.
+🔹 Upload d'images avec uploadThing
+L'utilisateur peut uploader une photo de profil et des posts avec images.
+L'URL de l'image est stockée dans Convex.
 ---
-🎨 5. Expérience utilisateur futuriste
+�� 5. Expérience utilisateur futuriste
 🔹 Effets visuels avancés
 Framer Motion pour les transitions fluides 
 ---
@@ -184,7 +184,7 @@ Voici une structure optimisée :
 │── /convex                -> Backend Convex (fonctions serverless)
 │   ├── functions.ts       -> Fonctions backend (mutations, queries)
 │   ├── schema.ts          -> Définition du schéma de la base de données
-│   ├── auth.ts            -> Gestion de l’authentification
+│   ├── auth.ts            -> Gestion de l'authentification
 │   ├── messages.ts        -> Fonctions pour la messagerie instantanée
 │   ├── users.ts           -> Gestion des utilisateurs
 │   ├── posts.ts           -> Gestion des posts
@@ -195,7 +195,7 @@ Voici une structure optimisée :
 │── convex.json            -> Config Convex
 │── package.json           -> Dépendances
 │── tsconfig.json          -> Config TypeScript
-│── .env.local             -> Variables d’environnement
+│── .env.local             -> Variables d'environnement
 ---
 Un dossier /convex dédié au backend et /app pour le frontend.
 
@@ -204,3 +204,10 @@ Réduire la bande passante :
 Compresser les images avant de les uploader.
 Utiliser des formats modernes pour réduire la taille des fichiers.
 Utiliser un CDN pour stocker certaines images en cache.
+
+[Menu latéral]
+📊 Vue d'ensemble
+👥 Gestion utilisateurs
+📈 Analyses
+🎯 Performance collaborateurs
+⚙️ Paramètres

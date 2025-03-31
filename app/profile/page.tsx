@@ -5,35 +5,34 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Textarea } from "@/app/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
 import { FaHeart, FaComment, FaShare, FaBookmark, FaEdit, FaTrash } from "react-icons/fa";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/app/hooks/useUser";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function ProfilePage() {
   const { user } = useUser();
-  const userStats = useQuery(api.users.getUserStats, user ? { userId: user._id } : "skip");
-  const savedPosts = useQuery(api.posts.getSavedPosts, user ? { userId: user._id } : "skip");
-  const savedBlogs = useQuery(api.blogs.getSavedBlogs, user ? { userId: user._id } : "skip");
-  const userReviews = useQuery(api.social.getUserReviews, user ? { targetId: user._id } : "skip");
+  const userStats = useQuery(api.users.getCollaborators, user ? { userId: user._id as Id<"users"> } : "skip");
+  const savedPosts = useQuery(api.posts.getSavedPosts, user ? { userId: user._id as Id<"users"> } : "skip");
+  const savedBlogs = useQuery(api.blogs.getSavedBlogs, user ? { userId: user._id as Id<"users"> } : "skip");
+  const userReviews = useQuery(api.social.getUserReviews, user ? { targetId: user._id as Id<"users"> } : "skip");
+  const authors = useQuery(api.users.getCollaborators, user ? { userId: user._id as Id<"users"> } : "skip") || [];
 
-  const updateProfile = useMutation(api.users.updateProfile);
-  const deleteAccount = useMutation(api.users.deleteAccount);
+  const updateProfile = useMutation(api.users.updateUser);
+  const deleteAccount = useMutation(api.users.deleteUser);
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     bio: user?.bio || "",
-    image: user?.image || "",
-    socialLinks: {
-      linkedin: user?.socialLinks?.linkedin || "",
-      github: user?.socialLinks?.github || "",
-      twitter: user?.socialLinks?.twitter || "",
-    },
+    imageUrl: user?.imageUrl || "",
+    github: user?.github || "",
+    linkedin: user?.linkedin || "",
   });
 
   const handleUpdateProfile = async () => {
@@ -89,28 +88,43 @@ export default function ProfilePage() {
             <div className="flex flex-col md:flex-row gap-8 items-center">
               <div className="relative w-32 h-32">
                 <Image
-                  src={user.image || "/images/default-avatar.png"}
+                  src={user.imageUrl || "/images/default-avatar.png"}
                   alt={user.name}
                   fill
                   className="object-cover rounded-full"
                 />
               </div>
               <div className="flex-1">
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center mb-4">
+                  <div className="flex items-center gap-2">
                   <h1 className="text-3xl font-bold">{user.name}</h1>
                   {user.role === "admin" && (
-                    <span className="px-3 py-1 bg-primary text-white rounded-full text-sm">
-                      Admin
-                    </span>
-                  )}
-                  {user.role === "colab" && (
+                    <div className="flex items-center gap-0">
                     <Image
-                      src="/webifyLogo.png"
-                      alt="Collaborateur certifié"
+                      src="/images/verify.svg"
+                      alt="Verifié"
                       width={24}
                       height={24}
                     />
+                    <span className=" bg-primary text-white rounded-full text-sm">
+                      Admin
+                    </span>
+                    </div>
                   )}
+                  {user.role === "collaborator" && (
+                    <div className="flex items-center gap-0">
+                      <Image
+                        src="/images/verify.svg"
+                        alt="Verifié"
+                        width={24}
+                        height={24}
+                      />
+                      <span className=" bg-primary text-white rounded-full text-sm">
+                        Colab
+                      </span>
+                      </div>
+                  )}
+                  </div>
                 </div>
                 <p className="text-muted-foreground mb-4">{user.bio}</p>
                 <div className="flex gap-4">
@@ -123,7 +137,7 @@ export default function ProfilePage() {
                     Modifier le profil
                   </Button>
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     onClick={handleDeleteAccount}
                     className="flex items-center gap-2"
                   >
@@ -161,31 +175,15 @@ export default function ProfilePage() {
                   <div>
                     <label className="text-sm font-medium mb-2 block">LinkedIn</label>
                     <Input
-                      value={formData.socialLinks.linkedin}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        socialLinks: { ...formData.socialLinks, linkedin: e.target.value }
-                      })}
+                      value={formData.linkedin}
+                      onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
                     />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-2 block">GitHub</label>
                     <Input
-                      value={formData.socialLinks.github}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        socialLinks: { ...formData.socialLinks, github: e.target.value }
-                      })}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Twitter</label>
-                    <Input
-                      value={formData.socialLinks.twitter}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        socialLinks: { ...formData.socialLinks, twitter: e.target.value }
-                      })}
+                      value={formData.github}
+                      onChange={(e) => setFormData({ ...formData, github: e.target.value })}
                     />
                   </div>
                   <div className="flex gap-4">
@@ -214,7 +212,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-medium">Likes</h3>
-                      <p className="text-2xl font-bold">{userStats?.likes || 0}</p>
+                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.likes || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -225,7 +223,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-medium">Commentaires</h3>
-                      <p className="text-2xl font-bold">{userStats?.comments || 0}</p>
+                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.comments || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -236,7 +234,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-medium">Partages</h3>
-                      <p className="text-2xl font-bold">{userStats?.shares || 0}</p>
+                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.shares || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -267,13 +265,13 @@ export default function ProfilePage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Image
-                              src={post.author.image || "/images/default-avatar.png"}
-                              alt={post.author.name}
+                              src={authors.find(a => a._id === post.authorId)?.imageUrl || "/images/default-avatar.png"}
+                              alt={authors.find(a => a._id === post.authorId)?.name || "Auteur"}
                               width={24}
                               height={24}
                               className="rounded-full"
                             />
-                            <span className="text-sm">{post.author.name}</span>
+                            <span className="text-sm">{authors.find(a => a._id === post.authorId)?.name || "Auteur"}</span>
                           </div>
                           <Button variant="ghost" size="sm">
                             <FaBookmark />
@@ -306,13 +304,13 @@ export default function ProfilePage() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <Image
-                                src={blog.author.image || "/images/default-avatar.png"}
-                                alt={blog.author.name}
+                                src={authors.find(a => a._id === blog.authorId)?.imageUrl || "/images/default-avatar.png"}
+                                alt={authors.find(a => a._id === blog.authorId)?.name || "Auteur"}
                                 width={24}
                                 height={24}
                                 className="rounded-full"
                               />
-                              <span className="text-sm">{blog.author.name}</span>
+                              <span className="text-sm">{authors.find(a => a._id === blog.authorId)?.name || "Auteur"}</span>
                             </div>
                             <Button variant="ghost" size="sm">
                               <FaBookmark />
@@ -332,14 +330,14 @@ export default function ProfilePage() {
                   <div key={review._id} className="bg-card rounded-lg p-6 shadow-lg">
                     <div className="flex items-center gap-4 mb-4">
                       <Image
-                        src={review.author.image || "/images/default-avatar.png"}
-                        alt={review.author.name}
+                        src={review.userImage || "/images/default-avatar.png"}
+                        alt={review.userName}
                         width={40}
                         height={40}
                         className="rounded-full"
                       />
                       <div>
-                        <h4 className="font-semibold">{review.author.name}</h4>
+                        <h4 className="font-semibold">{review.userName}</h4>
                         <div className="flex items-center gap-1">
                           {Array.from({ length: 5 }).map((_, i) => (
                             <FaHeart

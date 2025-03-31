@@ -26,8 +26,8 @@ export const createReview = mutation({
       }
 
       // Vérifier que l'utilisateur cible est un colab ou admin
-      if (target.role !== "colab" && target.role !== "admin") {
-        throw new Error("Les avis ne peuvent être donnés que sur les collaborateurs et administrateurs");
+      if (target.role !== "collaborator" && target.role !== "admin") {
+        throw new Error("Vous ne pouvez laisser un avis que sur un collaborateur ou un administrateur");
       }
     }
 
@@ -37,10 +37,13 @@ export const createReview = mutation({
     }
 
     const reviewId = await ctx.db.insert("reviews", {
-      authorId: args.authorId,
-      targetId: args.targetId,
+      userId: args.authorId,
+      userName: author.name,
+      userImage: author.imageUrl || "",
       content: args.content,
       rating: args.rating,
+      targetId: args.targetId,
+      createdAt: new Date().toISOString(),
       isAppReview: args.isAppReview,
     });
 
@@ -61,14 +64,16 @@ export const getAppReviews = query({
       .order("desc");
 
     if (args.cursor) {
-      reviewsQuery = reviewsQuery.filter((q) => q.lt(q.field("_id"), args.cursor));
+      const cursor = await ctx.db.get(args.cursor);
+      if (cursor) {
+        reviewsQuery = reviewsQuery.filter((q) => 
+          q.lt(q.field("_creationTime"), cursor._creationTime)
+        );
+      }
     }
 
-    if (args.limit) {
-      reviewsQuery = reviewsQuery.take(args.limit);
-    }
-
-    return await reviewsQuery.collect();
+    const allReviews = await reviewsQuery.collect();
+    return args.limit ? allReviews.slice(0, args.limit) : allReviews;
   },
 });
 
@@ -79,17 +84,14 @@ export const getUserReviews = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db
+    const allReviews = await ctx.db
       .query("reviews")
       .withIndex("by_target", (q) => q.eq("targetId", args.targetId))
       .filter((q) => q.eq(q.field("isAppReview"), false))
-      .order("desc");
+      .order("desc")
+      .collect();
 
-    if (args.limit) {
-      query = query.take(args.limit);
-    }
-
-    return await query.collect();
+    return args.limit ? allReviews.slice(0, args.limit) : allReviews;
   },
 });
 
@@ -256,5 +258,30 @@ export const removeFriend = mutation({
 
     await ctx.db.delete(friendship._id);
     return true;
+  },
+});
+
+export const getCollaboratorReviews = query({
+  args: {
+    limit: v.optional(v.number()),
+    cursor: v.optional(v.id("reviews")),
+  },
+  handler: async (ctx, args) => {
+    let reviewsQuery = ctx.db
+      .query("reviews")
+      .filter((q) => q.eq(q.field("isAppReview"), false))
+      .order("desc");
+
+    if (args.cursor) {
+      const cursor = await ctx.db.get(args.cursor);
+      if (cursor) {
+        reviewsQuery = reviewsQuery.filter((q) => 
+          q.lt(q.field("_creationTime"), cursor._creationTime)
+        );
+      }
+    }
+
+    const allReviews = await reviewsQuery.collect();
+    return args.limit ? allReviews.slice(0, args.limit) : allReviews;
   },
 }); 

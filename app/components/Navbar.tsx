@@ -1,11 +1,11 @@
 "use client";
 
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "../hooks/useUser";
 import Link from "next/link";
 import Image from "next/image";
-import { UserButton } from "@clerk/nextjs";
+import { signOut, signIn } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/app/lib/utils";
 import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
@@ -61,14 +61,14 @@ const routes = [
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const [open, setOpen] = useState(false);
 
   const isAdmin = user?.role === "admin";
-  const isAuthenticated = !!user;
+  const isAuthenticated = isSignedIn;
 
   return (
-    <div className="fixed w-full z-50 flex justify-between items-center py-2 px-4 border-b border-primary/10 bg-secondary h-16">
+    <div className="fixed w-full h-fit z-50 flex justify-between items-center py-2 px-4 border-b border-primary/10 bg-secondary">
       <div className="flex items-center">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger className="md:hidden">
@@ -97,13 +97,13 @@ const Navbar = () => {
             </nav>
           </SheetContent>
         </Sheet>
-        <Link href="/" className="flex items-center gap-2 ml-4 lg:ml-0">
+        <Link href="/" className="flex items-center gap-2 h-fit ml-4 lg:ml-0">
           <Image
-            src="/webifyLogo.png"
+            src="/images/webifyLogo1.png"
             alt="Logo"
-            width={40}
-            height={40}
-            className="rounded-full"
+            width={50}
+            height={50}
+            className="rounded-full size-11 object-cover"
           />
           <h1 className="text-xl font-bold hidden md:block">
             Webify
@@ -131,14 +131,21 @@ const Navbar = () => {
       </nav>
       <div className="flex items-center gap-4">
         {!isAuthenticated && (
-          <Link href="/sign-in">
-            <Button variant="ghost" size="sm">
-              Se connecter
-            </Button>
-          </Link>
+          <Button variant="ghost" size="sm" onClick={() => signIn("google")}>
+            Se connecter
+          </Button>
         )}
         {isAuthenticated && (
-          <UserButton afterSignOutUrl="/" />
+          <div className="flex items-center gap-4">
+            <Image
+              src={user?.imageUrl || "/default-avatar.png"}
+              alt="Profile"
+              width={50}
+              height={50}
+              className="rounded-full cursor-pointer size-12 object-cover"
+              onClick={() => signOut()}
+            />
+          </div>
         )}
       </div>
     </div>

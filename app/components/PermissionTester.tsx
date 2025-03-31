@@ -56,7 +56,6 @@ const PermissionTester = ({ userId }: { userId: Id<"users"> }) => {
       setResults({
         success: theoreticalResults.success && practicalResults.success,
         results: {
-          user: theoreticalResults.results.user,
           ...theoreticalResults.results,
           practicalTests: practicalResults.results.practicalTests,
         },
@@ -66,7 +65,7 @@ const PermissionTester = ({ userId }: { userId: Id<"users"> }) => {
       setResults({
         success: false,
         results: { user: { id: userId, role: "unknown" } },
-        error: error.message,
+        error: error instanceof Error ? error.message : "Une erreur s'est produite",
       });
     }
     setLoading(false);

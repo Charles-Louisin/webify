@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useUser } from "@/hooks/useUser";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Textarea } from "@/app/components/ui/textarea";
+import { useUser } from "@/app/hooks/useUser";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "react-hot-toast";
@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 export default function ContactPage() {
   const { user } = useUser();
   const router = useRouter();
-  const sendMessage = useMutation(api.messages.sendContactMessage);
+  const sendMessage = useMutation(api.messages.sendPrivateMessage);
 
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -44,9 +44,9 @@ export default function ContactPage() {
 
     try {
       await sendMessage({
-        userId: user._id,
-        subject: formData.subject,
-        message: formData.message,
+        senderId: user._id,
+        receiverId: user._id,
+        content: formData.message,
       });
 
       toast.success("Message envoyé avec succès !");
@@ -115,7 +115,7 @@ export default function ContactPage() {
                   <label className="text-sm font-medium">Message</label>
                   <Textarea
                     value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, message: e.target.value })}
                     rows={6}
                     required
                   />

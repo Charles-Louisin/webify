@@ -1,7 +1,7 @@
 "use client";
 
-import { useUser } from "@/hooks/useUser";
-import PermissionTester from "@/components/PermissionTester";
+import { useUser } from "@/app/hooks/useUser";
+import PermissionTester from "@/app/components/PermissionTester";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 

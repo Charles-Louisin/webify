@@ -1,17 +1,17 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import HeroSection from "@/components/home/HeroSection";
-import CollaboratorsSection from "@/components/home/CollaboratorsSection";
-import ReviewsSection from "@/components/home/ReviewsSection";
+import { api } from "../convex/_generated/api";
+import HeroSection from "./components/home/HeroSection";
+import CollaboratorsSection from "./components/home/CollaboratorsSection";
+import ReviewsSection from "./components/home/ReviewsSection";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 
 export default function Home() {
-  const collaborators = useQuery(api.users.getCollaborators);
-  const appReviews = useQuery(api.social.getAppReviews);
+  const collaborators = useQuery(api.users.getCollaborators, {}) || [];
+  const appReviews = useQuery(api.reviews.getAll, {}) || [];
   const { ref, inView } = useInView({
     threshold: 0.1,
     triggerOnce: true,
@@ -32,7 +32,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-center mb-12">
             Nos Collaborateurs Talentueux
           </h2>
-          <CollaboratorsSection collaborators={collaborators || []} />
+          <CollaboratorsSection collaborators={collaborators} />
         </div>
       </motion.div>
 
@@ -46,7 +46,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-center mb-12">
             Ce que nos utilisateurs disent
           </h2>
-          <ReviewsSection reviews={appReviews || []} />
+          <ReviewsSection reviews={appReviews} />
         </div>
       </motion.div>
     </div>

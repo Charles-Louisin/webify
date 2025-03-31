@@ -24,6 +24,7 @@ export const sendPrivateMessage = mutation({
     const messageId = await ctx.db.insert("messages", {
       senderId: args.senderId,
       receiverId: args.receiverId,
+      type: "private",
       content: args.content,
       attachments: args.attachments || [],
       isRead: false,
@@ -59,14 +60,13 @@ export const getPrivateMessages = query({
       .order("desc");
 
     if (args.cursor) {
-      messagesQuery = messagesQuery.filter((q) => q.lt(q.field("_id"), args.cursor));
+      messagesQuery = messagesQuery.filter((q) => 
+        q.lt(q.field("_id"), args.cursor!)
+      );
     }
 
-    if (args.limit) {
-      messagesQuery = messagesQuery.take(args.limit);
-    }
-
-    return await messagesQuery.collect();
+    const messages = await messagesQuery.collect();
+    return args.limit ? messages.slice(0, args.limit) : messages;
   },
 });
 
@@ -134,10 +134,11 @@ export const createChatGroup = mutation({
 export const getUserGroups = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const groups = await ctx.db
       .query("chatGroups")
-      .filter((q) => q.contains(q.field("members"), args.userId))
       .collect();
+    
+    return groups.filter(group => group.members.includes(args.userId));
   },
 });
 
@@ -280,5 +281,42 @@ export const leaveGroup = mutation({
     }
 
     return true;
+  },
+});
+
+export const getGroupMessages = query({
+  args: { groupId: v.id("chatGroups") },
+  handler: async (ctx, args) => {
+    const messages = await ctx.db
+      .query("messages")
+      .filter((q) => 
+        q.and(
+          q.eq(q.field("type"), "group"),
+          q.eq(q.field("receiverId"), args.groupId)
+        )
+      )
+      .order("desc")
+      .collect();
+    return messages;
+  },
+});
+
+export const sendGroupMessage = mutation({
+  args: {
+    senderId: v.id("users"),
+    groupId: v.id("chatGroups"),
+    content: v.string(),
+    attachments: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const messageId = await ctx.db.insert("messages", {
+      senderId: args.senderId,
+      receiverId: args.groupId,
+      type: "group",
+      content: args.content,
+      attachments: args.attachments || [],
+      isRead: false,
+    });
+    return messageId;
   },
 }); 

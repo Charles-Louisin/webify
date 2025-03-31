@@ -17,7 +17,7 @@ export const addSkill = mutation({
   handler: async (ctx, args) => {
     // Vérifier que l'utilisateur existe et a les permissions nécessaires
     const user = await ctx.db.get(args.userId);
-    if (!user || (user.role !== "colab" && user.role !== "admin")) {
+    if (!user || (user.role !== "collaborator" && user.role !== "admin")) {
       throw new Error("Permission refusée - Seuls les collaborateurs et administrateurs peuvent ajouter des compétences");
     }
 

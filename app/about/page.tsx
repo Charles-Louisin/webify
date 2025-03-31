@@ -5,12 +5,15 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import { FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
 import Link from "next/link";
+import { useUser } from "@/app/hooks/useUser";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function AboutPage() {
-  const collaborators = useQuery(api.users.getCollaborators);
+  const { user } = useUser();
+  const collaborators = useQuery(api.users.getCollaborators, {});
 
   return (
     <div className="min-h-screen pt-24 pb-16">
@@ -85,7 +88,7 @@ export default function AboutPage() {
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <Image
-                      src={collaborator.images?.[0] || "/images/default-avatar.png"}
+                      src={collaborator.imageUrl || "/images/default-avatar.png"}
                       alt={collaborator.name}
                       fill
                       className="object-cover"
@@ -95,7 +98,7 @@ export default function AboutPage() {
                         Admin
                       </div>
                     )}
-                    {collaborator.role === "colab" && (
+                    {collaborator.role === "collaborator" && (
                       <div className="absolute top-4 right-4">
                         <Image
                           src="/webifyLogo.png"
@@ -114,22 +117,22 @@ export default function AboutPage() {
                       {collaborator.bio}
                     </p>
                     <div className="flex justify-center gap-4">
-                      {collaborator.socialLinks?.linkedin && (
-                        <Link href={collaborator.socialLinks.linkedin} target="_blank">
+                      {collaborator.linkedin && (
+                        <Link href={collaborator.linkedin} target="_blank">
                           <Button variant="ghost" size="sm" className="hover:text-primary">
                             <FaLinkedin className="h-5 w-5" />
                           </Button>
                         </Link>
                       )}
-                      {collaborator.socialLinks?.github && (
-                        <Link href={collaborator.socialLinks.github} target="_blank">
+                      {collaborator.github && (
+                        <Link href={collaborator.github} target="_blank">
                           <Button variant="ghost" size="sm" className="hover:text-primary">
                             <FaGithub className="h-5 w-5" />
                           </Button>
                         </Link>
                       )}
-                      {collaborator.socialLinks?.twitter && (
-                        <Link href={collaborator.socialLinks.twitter} target="_blank">
+                      {collaborator.website && (
+                        <Link href={collaborator.website} target="_blank">
                           <Button variant="ghost" size="sm" className="hover:text-primary">
                             <FaTwitter className="h-5 w-5" />
                           </Button>
@@ -137,20 +140,6 @@ export default function AboutPage() {
                       )}
                     </div>
                   </div>
-                  {collaborator.images && collaborator.images.length > 1 && (
-                    <div className="px-6 pb-6 grid grid-cols-3 gap-2">
-                      {collaborator.images.slice(1, 4).map((image, index) => (
-                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
-                          <Image
-                            src={image}
-                            alt={`${collaborator.name} - Image ${index + 2}`}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </motion.div>
               ))}
             </div>

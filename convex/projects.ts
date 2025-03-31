@@ -17,7 +17,7 @@ export const createProject = mutation({
   handler: async (ctx, args) => {
     // Vérifier que l'auteur existe et a les permissions nécessaires
     const author = await ctx.db.get(args.authorId);
-    if (!author || (author.role !== "colab" && author.role !== "admin")) {
+    if (!author || (author.role !== "collaborator" && author.role !== "admin")) {
       throw new Error("Permission refusée - Seuls les collaborateurs et administrateurs peuvent créer des projets");
     }
 
@@ -28,6 +28,8 @@ export const createProject = mutation({
 
     const projectId = await ctx.db.insert("projects", {
       ...args,
+      githubLink: args.githubLink || "",
+      demoLink: args.demoLink || "",
       likes: [],
       comments: [],
     });
@@ -56,14 +58,16 @@ export const getAllProjects = query({
       .order("desc");
 
     if (args.cursor) {
-      projectsQuery = projectsQuery.filter((q) => q.lt(q.field("_id"), args.cursor));
+      const cursor = await ctx.db.get(args.cursor);
+      if (cursor) {
+        projectsQuery = projectsQuery.filter((q) => 
+          q.lt(q.field("_creationTime"), cursor._creationTime)
+        );
+      }
     }
 
-    if (args.limit) {
-      projectsQuery = projectsQuery.take(args.limit);
-    }
-
-    return await projectsQuery.collect();
+    const allProjects = await projectsQuery.collect();
+    return args.limit ? allProjects.slice(0, args.limit) : allProjects;
   },
 });
 
@@ -74,16 +78,13 @@ export const getAuthorProjects = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db
+    const allProjects = await ctx.db
       .query("projects")
       .withIndex("by_author", (q) => q.eq("authorId", args.authorId))
-      .order("desc");
+      .order("desc")
+      .collect();
 
-    if (args.limit) {
-      query = query.take(args.limit);
-    }
-
-    return await query.collect();
+    return args.limit ? allProjects.slice(0, args.limit) : allProjects;
   },
 });
 
@@ -186,7 +187,7 @@ export const likeProject = mutation({
         await ctx.db.patch(project.authorId, {
           stats: {
             ...author.stats,
-            likes: (author.stats.likes || 0) + 1,
+            projectsLiked: (author.stats.projectsLiked || 0) + 1,
           },
         });
       }
@@ -203,7 +204,7 @@ export const likeProject = mutation({
         await ctx.db.patch(project.authorId, {
           stats: {
             ...author.stats,
-            likes: Math.max(0, (author.stats.likes || 0) - 1),
+            projectsLiked: Math.max(0, (author.stats.projectsLiked || 0) - 1),
           },
         });
       }
@@ -233,15 +234,15 @@ export const commentProject = mutation({
 
     // Créer le commentaire
     const commentId = await ctx.db.insert("comments", {
-      postId: args.projectId, // Utiliser le même champ que pour les posts
       authorId: args.authorId,
       content: args.content,
+      parentId: args.projectId,
       likes: [],
     });
 
     // Mettre à jour le projet avec le nouveau commentaire
     await ctx.db.patch(args.projectId, {
-      comments: [...(project.comments || []), commentId],
+      comments: [...project.comments, commentId],
     });
 
     // Mettre à jour les stats de l'auteur du projet
@@ -250,11 +251,59 @@ export const commentProject = mutation({
       await ctx.db.patch(project.authorId, {
         stats: {
           ...projectAuthor.stats,
-          comments: (projectAuthor.stats.comments || 0) + 1,
+          commentsCreated: (projectAuthor.stats.commentsCreated || 0) + 1,
         },
       });
     }
 
     return commentId;
+  },
+});
+
+export const create = mutation({
+  args: {
+    title: v.string(),
+    description: v.string(),
+    images: v.array(v.string()),
+    video: v.optional(v.string()),
+    githubLink: v.string(),
+    demoLink: v.string(),
+    technologies: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Non autorisé");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("_id"), identity.subject))
+      .first();
+
+    if (!user || (user.role !== "admin" && user.role !== "collaborator")) {
+      throw new Error("Non autorisé");
+    }
+
+    const projectId = await ctx.db.insert("projects", {
+      title: args.title,
+      description: args.description,
+      images: args.images,
+      video: args.video,
+      githubLink: args.githubLink,
+      demoLink: args.demoLink,
+      technologies: args.technologies,
+      authorId: user._id,
+      comments: [],
+      likes: [],
+    });
+
+    return projectId;
+  },
+});
+
+export const getAll = query({
+  handler: async (ctx) => {
+    return await ctx.db.query("projects").collect();
   },
 }); 

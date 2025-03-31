@@ -25,11 +25,16 @@ export const createUser = mutation({
       name: args.name,
       email: args.email,
       role: "user",
-      image: args.image,
+      imageUrl: args.image,
+      userId: args.email,
       stats: {
-        likes: 0,
-        comments: 0,
-        shares: 0,
+        projectsCreated: 0,
+        projectsLiked: 0,
+        postsCreated: 0,
+        postsLiked: 0,
+        commentsCreated: 0,
+        commentsLiked: 0,
+        likedBy: [],
       },
     });
 
@@ -107,7 +112,7 @@ export const updateUserRole = mutation({
       throw new Error("Utilisateur non trouvé");
     }
 
-    await ctx.db.patch(args.userId, { role: args.newRole });
+    await ctx.db.patch(args.userId, { role: args.newRole as "user" | "admin" | "collaborator" });
     return true;
   },
 });

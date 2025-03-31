@@ -12,7 +12,7 @@ export const getGlobalStats = query({
     // Récupérer tous les utilisateurs
     const users = await ctx.db.query("users").collect();
     const totalUsers = users.length;
-    const totalColabs = users.filter(user => user.role === "colab").length;
+    const totalColabs = users.filter(user => user.role === "collaborator").length;
     const totalAdmins = users.filter(user => user.role === "admin").length;
 
     // Récupérer tous les posts
@@ -195,9 +195,9 @@ export const getMostActiveUsers = query({
           posts.length * 2 +
           projects.length * 3 +
           blogs.length * 2 +
-          (user.stats?.likes || 0) +
-          (user.stats?.comments || 0) * 2 +
-          (user.stats?.shares || 0) * 3;
+          (user.stats?.postsLiked || 0) +
+          (user.stats?.commentsLiked || 0) * 2 +
+          (user.stats?.projectsLiked || 0) * 3;
 
         return {
           user,

@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { filter } from "convex-helpers/server/filter";
 
 // Créer un nouvel article de blog
 export const createBlog = mutation({
@@ -14,7 +15,7 @@ export const createBlog = mutation({
   handler: async (ctx, args) => {
     // Vérifier que l'auteur existe et a les permissions nécessaires
     const author = await ctx.db.get(args.authorId);
-    if (!author || (author.role !== "colab" && author.role !== "admin")) {
+    if (!author || (author.role !== "collaborator" && author.role !== "admin")) {
       throw new Error("Permission refusée - Seuls les collaborateurs et administrateurs peuvent créer des articles");
     }
 
@@ -25,6 +26,7 @@ export const createBlog = mutation({
       saves: [],
       shares: 0,
       isPublished: true,
+      createdAt: new Date().toISOString(),
     });
 
     return blogId;
@@ -53,18 +55,21 @@ export const getAllBlogs = query({
       .order("desc");
 
     if (args.tag) {
-      blogsQuery = blogsQuery.filter((q) => q.contains(q.field("tags"), args.tag));
+      const blogs = await blogsQuery.collect();
+      return blogs.filter(blog => blog.tags.includes(args.tag!));
     }
 
     if (args.cursor) {
-      blogsQuery = blogsQuery.filter((q) => q.lt(q.field("_id"), args.cursor));
+      const cursor = await ctx.db.get(args.cursor);
+      if (cursor) {
+        blogsQuery = blogsQuery.filter((q) => 
+          q.lt(q.field("_creationTime"), cursor._creationTime)
+        );
+      }
     }
 
-    if (args.limit) {
-      blogsQuery = blogsQuery.take(args.limit);
-    }
-
-    return await blogsQuery.collect();
+    const blogs = await blogsQuery.collect();
+    return args.limit ? blogs.slice(0, args.limit) : blogs;
   },
 });
 
@@ -81,11 +86,8 @@ export const getAuthorBlogs = query({
       .filter((q) => q.eq(q.field("isPublished"), true))
       .order("desc");
 
-    if (args.limit) {
-      query = query.take(args.limit);
-    }
-
-    return await query.collect();
+    const blogs = await query.collect();
+    return args.limit ? blogs.slice(0, args.limit) : blogs;
   },
 });
 
@@ -181,7 +183,7 @@ export const likeBlog = mutation({
         await ctx.db.patch(blog.authorId, {
           stats: {
             ...author.stats,
-            likes: (author.stats.likes || 0) + 1,
+            postsLiked: (author.stats.postsLiked || 0) + 1,
           },
         });
       }
@@ -198,7 +200,7 @@ export const likeBlog = mutation({
         await ctx.db.patch(blog.authorId, {
           stats: {
             ...author.stats,
-            likes: Math.max(0, (author.stats.likes || 0) - 1),
+            postsLiked: Math.max(0, (author.stats.postsLiked || 0) - 1),
           },
         });
       }
@@ -228,7 +230,7 @@ export const commentBlog = mutation({
 
     // Créer le commentaire
     const commentId = await ctx.db.insert("comments", {
-      postId: args.blogId, // Utiliser le même champ que pour les posts
+      parentId: args.blogId,
       authorId: args.authorId,
       content: args.content,
       likes: [],
@@ -245,7 +247,7 @@ export const commentBlog = mutation({
       await ctx.db.patch(blog.authorId, {
         stats: {
           ...blogAuthor.stats,
-          comments: (blogAuthor.stats.comments || 0) + 1,
+          commentsCreated: (blogAuthor.stats.commentsCreated || 0) + 1,
         },
       });
     }
@@ -319,11 +321,21 @@ export const shareBlog = mutation({
       await ctx.db.patch(blog.authorId, {
         stats: {
           ...author.stats,
-          shares: (author.stats.shares || 0) + 1,
+          postsLiked: (author.stats.postsLiked || 0) + 1,
         },
       });
     }
 
     return true;
+  },
+});
+
+export const getSavedBlogs = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    return await filter(
+      ctx.db.query("blogs"),
+      (blog) => blog.saves.includes(args.userId)
+    ).order("desc").collect();
   },
 }); 

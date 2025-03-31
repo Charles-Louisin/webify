@@ -5,18 +5,22 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
+import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { FaUserFriends, FaUsers, FaPaperPlane, FaImage, FaPlus } from "react-icons/fa";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/app/hooks/useUser";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
+import { Id } from "@/convex/_generated/dataModel";
+import { useSearchParams } from "next/navigation";
 
 export default function MessagesPage() {
   const { user } = useUser();
-  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get("chat");
+  const [selectedChat, setSelectedChat] = useState<string | null>(chatId);
   const [messageInput, setMessageInput] = useState("");
   const [selectedTab, setSelectedTab] = useState<"friends" | "groups">("friends");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -26,16 +30,50 @@ export default function MessagesPage() {
   const groups = useQuery(api.messages.getUserGroups, user ? { userId: user._id } : "skip");
   const messages = useQuery(
     api.messages.getPrivateMessages,
-    selectedChat && user ? { userId1: user._id, userId2: selectedChat } : "skip"
+    selectedChat && user ? { userId1: user._id, userId2: selectedChat as Id<"users"> } : "skip"
   );
   const groupMessages = useQuery(
     api.messages.getGroupMessages,
-    selectedChat && selectedTab === "groups" ? { groupId: selectedChat } : "skip"
+    selectedChat && selectedTab === "groups" && groups?.some(g => g._id === selectedChat)
+      ? { groupId: selectedChat as Id<"chatGroups"> }
+      : "skip"
   );
+
+  // Sélectionner automatiquement le chat si spécifié dans l'URL
+  useEffect(() => {
+    if (chatId) {
+      if (friends?.some(friend => friend._id === chatId)) {
+        setSelectedChat(chatId);
+        setSelectedTab("friends");
+      } else if (groups?.some(group => group._id === chatId)) {
+        setSelectedChat(chatId);
+        setSelectedTab("groups");
+      }
+    }
+  }, [chatId, friends, groups]);
 
   // Mutations
   const sendMessage = useMutation(api.messages.sendPrivateMessage);
   const sendGroupMessage = useMutation(api.messages.sendGroupMessage);
+  const updateOnlineStatus = useMutation(api.users.updateOnlineStatus);
+
+  // Mettre à jour le statut en ligne
+  useEffect(() => {
+    if (user) {
+      updateOnlineStatus({ userId: user._id, online: true });
+      
+      // Mettre à jour le statut hors ligne quand l'utilisateur quitte la page
+      const handleBeforeUnload = () => {
+        updateOnlineStatus({ userId: user._id, online: false });
+      };
+      
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        updateOnlineStatus({ userId: user._id, online: false });
+      };
+    }
+  }, [user]);
 
   // Scroll automatique vers le bas
   useEffect(() => {
@@ -49,13 +87,13 @@ export default function MessagesPage() {
       if (selectedTab === "friends") {
         await sendMessage({
           senderId: user._id,
-          receiverId: selectedChat,
+          receiverId: selectedChat as Id<"users">,
           content: messageInput,
         });
       } else {
         await sendGroupMessage({
           senderId: user._id,
-          groupId: selectedChat,
+          groupId: selectedChat as Id<"chatGroups">,
           content: messageInput,
         });
       }
@@ -90,7 +128,7 @@ export default function MessagesPage() {
           <div className="grid md:grid-cols-[300px,1fr] h-[calc(100vh-200px)]">
             {/* Sidebar */}
             <div className="border-r">
-              <Tabs value={selectedTab} onValueChange={(value: "friends" | "groups") => setSelectedTab(value)}>
+              <Tabs defaultValue={selectedTab} onValueChange={(value) => setSelectedTab(value as "friends" | "groups")}>
                 <TabsList className="w-full grid grid-cols-2">
                   <TabsTrigger value="friends" className="flex items-center gap-2">
                     <FaUserFriends />
@@ -116,7 +154,7 @@ export default function MessagesPage() {
                           }`}
                         >
                           <Image
-                            src={friend.image || "/images/default-avatar.png"}
+                            src={friend.imageUrl || "/images/default-avatar.png"}
                             alt={friend.name}
                             width={40}
                             height={40}
@@ -125,7 +163,7 @@ export default function MessagesPage() {
                           <div className="text-left">
                             <p className="font-medium">{friend.name}</p>
                             <p className="text-sm text-muted-foreground">
-                              {friend.status || "En ligne"}
+                              {friend.stats?.online ? "En ligne" : "Hors ligne"}
                             </p>
                           </div>
                         </button>
@@ -138,7 +176,6 @@ export default function MessagesPage() {
                   <ScrollArea className="h-[calc(100vh-280px)]">
                     <div className="p-4 space-y-4">
                       <Button
-                        variant="outline"
                         className="w-full flex items-center gap-2 mb-4"
                       >
                         <FaPlus />
@@ -155,7 +192,7 @@ export default function MessagesPage() {
                           }`}
                         >
                           <Image
-                            src={group.image || "/images/default-group.png"}
+                            src={group.image || "/images/img2.jpg"}
                             alt={group.name}
                             width={40}
                             height={40}
@@ -164,7 +201,7 @@ export default function MessagesPage() {
                           <div className="text-left">
                             <p className="font-medium">{group.name}</p>
                             <p className="text-sm text-muted-foreground">
-                              {group.members.length} membres
+                              {group.members.length || 0} membres
                             </p>
                           </div>
                         </button>
@@ -184,7 +221,7 @@ export default function MessagesPage() {
                     {selectedTab === "friends" ? (
                       <div className="flex items-center gap-4">
                         <Image
-                          src={friends?.find(f => f._id === selectedChat)?.image || "/images/default-avatar.png"}
+                          src={friends?.find(f => f._id === selectedChat)?.imageUrl || "/images/img1.jpg"}
                           alt="Contact"
                           width={40}
                           height={40}
@@ -194,7 +231,9 @@ export default function MessagesPage() {
                           <h2 className="font-semibold">
                             {friends?.find(f => f._id === selectedChat)?.name}
                           </h2>
-                          <p className="text-sm text-muted-foreground">En ligne</p>
+                          <p className="text-sm text-muted-foreground">
+                            {friends?.find(f => f._id === selectedChat)?.stats?.online ? "En ligne" : "Hors ligne"}
+                          </p>
                         </div>
                       </div>
                     ) : (
@@ -221,7 +260,7 @@ export default function MessagesPage() {
                   {/* Messages */}
                   <ScrollArea className="flex-1 p-4">
                     <div className="space-y-4">
-                      {(selectedTab === "friends" ? messages : groupMessages)?.map((message) => (
+                      {(selectedTab === "friends" ? messages : groupMessages)?.map((message: any) => (
                         <div
                           key={message._id}
                           className={`flex ${
@@ -253,7 +292,7 @@ export default function MessagesPage() {
                   {/* Zone de saisie */}
                   <div className="p-4 border-t">
                     <div className="flex gap-4">
-                      <Button variant="outline" size="icon">
+                      <Button>
                         <FaImage className="h-5 w-5" />
                       </Button>
                       <Input
