@@ -119,21 +119,21 @@ export default function AboutPage() {
                     <div className="flex justify-center gap-4">
                       {collaborator.linkedin && (
                         <Link href={collaborator.linkedin} target="_blank">
-                          <Button variant="ghost" size="sm" className="hover:text-primary">
+                          <Button className="hover:text-primary">
                             <FaLinkedin className="h-5 w-5" />
                           </Button>
                         </Link>
                       )}
                       {collaborator.github && (
                         <Link href={collaborator.github} target="_blank">
-                          <Button variant="ghost" size="sm" className="hover:text-primary">
+                          <Button className="hover:text-primary">
                             <FaGithub className="h-5 w-5" />
                           </Button>
                         </Link>
                       )}
                       {collaborator.website && (
                         <Link href={collaborator.website} target="_blank">
-                          <Button variant="ghost" size="sm" className="hover:text-primary">
+                          <Button className="hover:text-primary">
                             <FaTwitter className="h-5 w-5" />
                           </Button>
                         </Link>
