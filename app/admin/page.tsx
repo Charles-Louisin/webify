@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+export const dynamic = "force-dynamic";
+
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/hooks/useUser";
 import { useQuery } from "convex/react";
@@ -29,11 +31,11 @@ export default function AdminDashboard() {
     user?._id ? { adminId: user._id } : "skip"
   );
 
-  // Rediriger si l'utilisateur n'est pas administrateur
-  if (!session || session.user.role !== "admin") {
-    router.push("/");
-    return null;
-  }
+  useEffect(() => {
+    if (session && session.user.role !== "admin") {
+      router.push("/");
+    }
+  }, [session, router]);
 
   if (!session) {
     return (

@@ -3,15 +3,24 @@
 import { useSession } from "next-auth/react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function useUser() {
   const { data: session } = useSession();
   const createUser = useMutation(api.auth.createUser);
-  const user = useQuery(api.users.getUser, session?.user?.email ? { email: session.user.email } : "skip");
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (session?.user?.email && session.user.name && !user) {
+    setIsClient(true);
+  }, []);
+
+  const user = useQuery(
+    api.users.getCurrentUser,
+    isClient && session?.user?.email ? { userId: session.user.email } : "skip"
+  );
+
+  useEffect(() => {
+    if (isClient && session?.user?.email && session.user.name && !user) {
       createUser({
         name: session.user.name,
         email: session.user.email,
@@ -20,7 +29,7 @@ export function useUser() {
         console.error("Error creating user in Convex:", error);
       });
     }
-  }, [session, user, createUser]);
+  }, [session, user, createUser, isClient]);
 
   return { user, session };
 } 
