@@ -211,7 +211,6 @@ export default function BlogPage() {
                     <div className="flex justify-end gap-2 mt-6">
                       <Button
                         type="button"
-                        variant="outline"
                         onClick={() => {
                           resetForm();
                           setIsCreateDialogOpen(false);
@@ -236,7 +235,6 @@ export default function BlogPage() {
               {categories.map((category) => (
                 <Button
                   key={category.value}
-                  variant={selectedCategory === category.value ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category.value)}
                   className="flex items-center gap-2"
                 >
@@ -309,8 +307,6 @@ export default function BlogPage() {
                       </div>
                       <div className="flex gap-2">
                         <Button
-                          variant="ghost"
-                          size="sm"
                           onClick={() => handleLike(blog._id)}
                           className="hover:text-red-500"
                         >
@@ -319,8 +315,6 @@ export default function BlogPage() {
                           />
                         </Button>
                         <Button
-                          variant="ghost"
-                          size="sm"
                           onClick={() => handleSave(blog._id)}
                           className="hover:text-primary"
                         >
@@ -329,8 +323,6 @@ export default function BlogPage() {
                           />
                         </Button>
                         <Button
-                          variant="ghost"
-                          size="sm"
                           onClick={() => handleShare(blog._id)}
                           className="hover:text-primary"
                         >

@@ -9,7 +9,6 @@ export default function BackButton() {
 
   return (
     <Button
-      variant="ghost"
       className="absolute top-4 left-4"
       onClick={() => router.back()}
     >

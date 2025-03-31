@@ -129,7 +129,6 @@ export default function ProfilePage() {
                 <p className="text-muted-foreground mb-4">{user.bio}</p>
                 <div className="flex gap-4">
                   <Button
-                    variant="outline"
                     onClick={() => setIsEditing(!isEditing)}
                     className="flex items-center gap-2"
                   >
@@ -137,7 +136,6 @@ export default function ProfilePage() {
                     Modifier le profil
                   </Button>
                   <Button
-                    variant="outline"
                     onClick={handleDeleteAccount}
                     className="flex items-center gap-2"
                   >
@@ -188,7 +186,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex gap-4">
                     <Button onClick={handleUpdateProfile}>Enregistrer</Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>Annuler</Button>
+                    <Button onClick={() => setIsEditing(false)}>Annuler</Button>
                   </div>
                 </div>
               </motion.div>
@@ -212,7 +210,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-medium">Likes</h3>
-                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.likes || 0}</p>
+                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.postsLiked || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -223,7 +221,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-medium">Commentaires</h3>
-                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.comments || 0}</p>
+                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.commentsCreated || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -234,7 +232,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <h3 className="font-medium">Partages</h3>
-                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.shares || 0}</p>
+                      <p className="text-2xl font-bold">{userStats?.[0]?.stats?.postsCreated || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -273,7 +271,7 @@ export default function ProfilePage() {
                             />
                             <span className="text-sm">{authors.find(a => a._id === post.authorId)?.name || "Auteur"}</span>
                           </div>
-                          <Button variant="ghost" size="sm">
+                          <Button>
                             <FaBookmark />
                           </Button>
                         </div>
@@ -312,7 +310,7 @@ export default function ProfilePage() {
                               />
                               <span className="text-sm">{authors.find(a => a._id === blog.authorId)?.name || "Auteur"}</span>
                             </div>
-                            <Button variant="ghost" size="sm">
+                            <Button>
                               <FaBookmark />
                             </Button>
                           </div>

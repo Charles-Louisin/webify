@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { motion } from "framer-motion";
@@ -16,7 +16,7 @@ import Link from "next/link";
 import { Id } from "@/convex/_generated/dataModel";
 import { useSearchParams } from "next/navigation";
 
-export default function MessagesPage() {
+function MessagesContent() {
   const { user } = useUser();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("chat");
@@ -317,5 +317,13 @@ export default function MessagesPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen pt-24 pb-16 flex items-center justify-center">Chargement...</div>}>
+      <MessagesContent />
+    </Suspense>
   );
 } 

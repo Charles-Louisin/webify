@@ -245,7 +245,6 @@ export default function ProjectsPage() {
                     <div className="flex justify-end gap-2 mt-6">
                       <Button
                         type="button"
-                        variant="outline"
                         onClick={() => {
                           resetForm();
                           setIsCreateDialogOpen(false);
@@ -270,7 +269,6 @@ export default function ProjectsPage() {
               {categories.map((category) => (
                 <Button
                   key={category.value}
-                  variant={selectedCategory === category.value ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category.value)}
                   className="flex items-center gap-2"
                 >
@@ -356,8 +354,6 @@ export default function ProjectsPage() {
                       </div>
                       <div className="flex gap-2">
                         <Button
-                          variant="ghost"
-                          size="sm"
                           onClick={() => handleLike(project._id)}
                           className="hover:text-red-500"
                         >
@@ -368,8 +364,6 @@ export default function ProjectsPage() {
                         {project.githubLink && (
                           <Link href={project.githubLink} target="_blank">
                             <Button
-                              variant="ghost"
-                              size="sm"
                               className="hover:text-primary"
                             >
                               <FaGithub />
@@ -379,8 +373,6 @@ export default function ProjectsPage() {
                         {project.demoLink && (
                           <Link href={project.demoLink} target="_blank">
                             <Button
-                              variant="ghost"
-                              size="sm"
                               className="hover:text-primary"
                             >
                               <FaExternalLinkAlt />

@@ -19,7 +19,6 @@ export default function SignIn() {
 
         <div className="space-y-4">
           <Button
-            variant="outline"
             className="w-full"
             onClick={() => signIn("google", { callbackUrl: "/" })}
           >

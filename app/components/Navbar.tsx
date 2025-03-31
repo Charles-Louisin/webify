@@ -131,7 +131,7 @@ const Navbar = () => {
       </nav>
       <div className="flex items-center gap-4">
         {!isAuthenticated && (
-          <Button variant="ghost" size="sm" onClick={() => signIn("google")}>
+          <Button onClick={() => signIn("google")}>
             Se connecter
           </Button>
         )}
