@@ -8,6 +8,7 @@ import { FcGoogle } from "react-icons/fc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
 import { Label } from "@/app/components/ui/label";
 import { toast } from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +19,18 @@ export default function SignIn() {
     password: "",
     confirmPassword: ""
   });
+
+  const searchParams = useSearchParams();
+  const error = searchParams?.get("error");
+
+  const getErrorMessage = (error: string) => {
+    switch (error) {
+      case "Callback":
+        return "Votre compte a été supprimé. Veuillez vous réinscrire pour créer un nouveau compte.";
+      default:
+        return "Une erreur est survenue lors de la connexion. Veuillez réessayer.";
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,6 +104,12 @@ export default function SignIn() {
             Connectez-vous ou créez un compte pour continuer
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            {getErrorMessage(error)}
+          </div>
+        )}
 
         <Tabs defaultValue="login" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">

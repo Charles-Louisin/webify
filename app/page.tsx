@@ -11,7 +11,7 @@ import { useInView } from "react-intersection-observer";
 
 export default function Home() {
   const collaborators = useQuery(api.users.getCollaborators, {}) || [];
-  const appReviews = useQuery(api.reviews.getAll, {});
+  const appReviews = useQuery(api.social.getAppReviews, {});
   
   // Debug logs
   useEffect(() => {

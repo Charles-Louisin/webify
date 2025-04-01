@@ -39,29 +39,37 @@ export const add = mutation({
     rating: v.number(),
     targetType: v.string(),
     targetId: v.optional(v.string()),
+    session: v.object({
+      user: v.object({
+        email: v.string(),
+        name: v.optional(v.string()),
+        image: v.optional(v.string()),
+      })
+    })
   },
   handler: async (ctx, args) => {
     console.log("Tentative d'ajout d'avis avec:", args);
 
-    const identity = await ctx.auth.getUserIdentity();
-    console.log("Identity reçue:", identity);
-
-    if (!identity?.email) {
-      console.log("Pas d'email trouvé dans l'identité");
+    if (!args.session?.user?.email) {
+      console.log("Pas d'email trouvé dans la session");
       throw new Error("Non authentifié");
     }
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_email", (q) => q.eq("email", identity.email as string))
+      .withIndex("by_email", (q) => q.eq("email", args.session.user.email))
       .unique();
 
     console.log("Utilisateur trouvé:", user);
 
     if (!user) {
-      console.log("Aucun utilisateur trouvé pour l'email:", identity.email);
+      console.log("Aucun utilisateur trouvé pour l'email:", args.session.user.email);
       throw new Error("Utilisateur non trouvé");
     }
+
+    // Déterminer si c'est un avis sur l'application
+    const isAppReview = args.targetType === "app";
+    console.log("Type d'avis:", isAppReview ? "Application" : "Utilisateur");
 
     const review = await ctx.db.insert("reviews", {
       userId: user._id,
@@ -71,7 +79,7 @@ export const add = mutation({
       rating: args.rating,
       targetId: args.targetId,
       createdAt: new Date().toISOString(),
-      isAppReview: args.targetType === "app",
+      isAppReview: isAppReview
     });
 
     console.log("Avis créé avec succès:", review);

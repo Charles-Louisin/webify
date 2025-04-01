@@ -158,4 +158,15 @@ export const getUserByEmail = query({
       return null;
     }
   },
+});
+
+export const getDeletedUserByEmail = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
+    return user === null;
+  },
 }); 

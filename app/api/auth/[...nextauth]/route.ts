@@ -110,7 +110,17 @@ const handler = NextAuth({
           console.log("Utilisateur existant:", existingUser);
 
           if (!existingUser) {
-            // Créer l'utilisateur s'il n'existe pas
+            // Vérifier si l'utilisateur a été supprimé
+            const deletedUser = await convex.query(api.users.getDeletedUserByEmail, {
+              email: user.email
+            });
+
+            if (deletedUser) {
+              console.log("❌ Utilisateur précédemment supprimé, redirection vers l'inscription");
+              return false; // Cela redirigera vers /auth/signin avec une erreur
+            }
+
+            // Créer l'utilisateur s'il n'a jamais existé
             const newUser = await convex.mutation(api.auth.createUser, {
               name: user.name || "",
               email: user.email,
@@ -132,9 +142,11 @@ const handler = NextAuth({
             console.log("✅ Nouvel utilisateur créé:", newUser);
           }
         } catch (error) {
-          console.error("❌ Erreur lors de la création de l'utilisateur:", error);
+          console.error("❌ Erreur lors de la création/vérification de l'utilisateur:", error);
+          return false; // Rediriger vers la page de connexion en cas d'erreur
         }
       }
+      return true; // Autoriser la connexion dans les autres cas
     },
     async signOut({ token }) {
       console.log("👋 Événement signOut:", token);
