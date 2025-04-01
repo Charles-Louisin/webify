@@ -1,7 +1,4 @@
-import { defineAuth } from "convex/server";
-import { v } from "convex/values";
-
-export default defineAuth({
+export default {
   providers: [
     {
       domain: "https://webify-rho.vercel.app",
@@ -12,4 +9,4 @@ export default defineAuth({
       applicationID: "next-auth",
     }
   ],
-}); 
+}; 
