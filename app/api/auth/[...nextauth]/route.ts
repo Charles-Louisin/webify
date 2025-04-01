@@ -29,28 +29,60 @@ const handler = NextAuth({
     error: "/auth/error",
     verifyRequest: "/auth/verify-request",
   },
+  debug: true,
   callbacks: {
-    async signIn({ user }) {
-      // La création de l'utilisateur sera gérée côté client après la connexion réussie
-      return true;
+    async signIn({ user, account, profile, email, credentials }) {
+      try {
+        console.log("Tentative de connexion pour:", user.email);
+        // Vérifiez si l'email est celui de l'administrateur
+        if (user.email === "clynlouisin@gmail.com") {
+          user.role = "admin";
+        }
+        return true;
+      } catch (error) {
+        console.error("Erreur lors de la connexion:", error);
+        return false;
+      }
     },
     async session({ session, token }) {
-      if (session?.user) {
-        session.user.id = token.sub;
-        session.user.role = token.role as string || "user";
+      try {
+        if (session?.user) {
+          session.user.id = token.sub;
+          // Assurez-vous que le rôle est correctement transmis
+          session.user.role = token.role as string || "user";
+          console.log("Session créée avec le rôle:", session.user.role);
+        }
+        return session;
+      } catch (error) {
+        console.error("Erreur lors de la création de la session:", error);
+        return session;
       }
-      return session;
     },
     async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role as string || "user";
+      try {
+        if (user) {
+          // Conservez le rôle dans le token
+          token.role = user.role || "user";
+          console.log("JWT créé avec le rôle:", token.role);
+        }
+        return token;
+      } catch (error) {
+        console.error("Erreur lors de la création du JWT:", error);
+        return token;
       }
-      return token;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return url;
-      if (url.startsWith(baseUrl)) return url;
-      return "/";
+      try {
+        console.log("Redirection vers:", url);
+        console.log("URL de base:", baseUrl);
+        
+        if (url.startsWith("/")) return `${baseUrl}${url}`;
+        if (url.startsWith(baseUrl)) return url;
+        return baseUrl;
+      } catch (error) {
+        console.error("Erreur lors de la redirection:", error);
+        return baseUrl;
+      }
     },
   },
 });

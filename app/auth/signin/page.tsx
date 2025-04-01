@@ -20,7 +20,12 @@ export default function SignIn() {
         <div className="space-y-4">
           <Button
             className="w-full"
-            onClick={() => signIn("google", { callbackUrl: "/" })}
+            onClick={() => signIn("google", { 
+              callbackUrl: "/",
+              redirect: true
+            }).catch(error => {
+              console.error("Erreur de connexion:", error);
+            })}
           >
             <FcGoogle className="mr-2 h-5 w-5" />
             Continuer avec Google
