@@ -70,7 +70,7 @@ export default function CollaboratorsSection({ collaborators }: CollaboratorsSec
           index={index}
           onLike={() => handleLike(collaborator._id)}
           onMessage={() => handleMessage(collaborator._id.toString())}
-          hasLiked={user && collaborator.stats?.likedBy?.includes(user._id)}
+          hasLiked={!!user && !!collaborator.stats?.likedBy?.includes(user._id)}
         />
       ))}
     </div>
