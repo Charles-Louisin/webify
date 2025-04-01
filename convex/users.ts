@@ -58,11 +58,32 @@ export const likeProfile = mutation({
 export const getCurrentUser = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("email"), args.userId))
-      .first();
-    return user;
+    console.log("🔍 getCurrentUser appelé avec userId:", args.userId);
+    
+    // Vérifier l'authentification
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      console.log("❌ Utilisateur non authentifié");
+      return null;
+    }
+
+    try {
+      const user = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.userId))
+        .unique();
+      
+      if (!user) {
+        console.log("❓ Aucun utilisateur trouvé pour l'email:", args.userId);
+        return null;
+      }
+
+      console.log("✅ Utilisateur trouvé:", user);
+      return user;
+    } catch (error) {
+      console.error("❌ Erreur dans getCurrentUser:", error);
+      throw new Error("Erreur lors de la récupération de l'utilisateur");
+    }
   },
 });
 

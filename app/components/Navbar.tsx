@@ -68,11 +68,11 @@ const Navbar = () => {
   const isAuthenticated = session;
 
   return (
-    <div className="fixed w-full h-fit z-50 flex justify-between items-center py-2 px-4 border-b border-primary/10 bg-secondary">
+    <div className="fixed w-full h-fit z-50 flex justify-between items-center py-2 px-4 border-b border-white/10 bg-white/10 backdrop-blur-lg">
       <div className="flex items-center">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger className="md:hidden">
-            <Menu className="h-6 w-6" />
+            <Menu className="h-6 w-6 text-gray-800" />
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] sm:w-[400px]">
             <nav className="flex flex-col gap-4">
@@ -86,7 +86,7 @@ const Navbar = () => {
                     href={route.href}
                     className={cn(
                       "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition",
-                      pathname === route.href ? "text-primary bg-primary/10" : "text-muted-foreground",
+                      pathname === route.href ? "text-primary bg-primary/10" : "text-gray-700",
                     )}
                     onClick={() => setOpen(false)}
                   >
@@ -105,7 +105,7 @@ const Navbar = () => {
             height={50}
             className="rounded-full size-11 object-cover"
           />
-          <h1 className="text-xl font-bold hidden md:block">
+          <h1 className="text-xl font-bold hidden md:block text-gray-800 font-futuristic">
             Webify
           </h1>
         </Link>
@@ -121,7 +121,7 @@ const Navbar = () => {
               href={route.href}
               className={cn(
                 "text-sm font-medium transition-colors hover:text-primary",
-                pathname === route.href ? "text-primary" : "text-muted-foreground"
+                pathname === route.href ? "text-primary" : "text-gray-700"
               )}
             >
               {route.label}
@@ -131,7 +131,10 @@ const Navbar = () => {
       </nav>
       <div className="flex items-center gap-4">
         {!isAuthenticated && (
-          <Button onClick={() => signIn("google")}>
+          <Button 
+            onClick={() => signIn("google")}
+            className="bg-primary hover:bg-primary/90 text-white shadow-sm"
+          >
             Se connecter
           </Button>
         )}
@@ -142,7 +145,7 @@ const Navbar = () => {
               alt="Profile"
               width={50}
               height={50}
-              className="rounded-full cursor-pointer size-12 object-cover"
+              className="rounded-full cursor-pointer size-12 object-cover border-2 border-white/50"
               onClick={() => signOut()}
             />
           </div>

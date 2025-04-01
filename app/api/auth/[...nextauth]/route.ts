@@ -23,68 +23,93 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 jours
+    updateAge: 24 * 60 * 60, // 24 heures
+  },
   pages: {
     signIn: "/auth/signin",
     signOut: "/auth/signout",
     error: "/auth/error",
     verifyRequest: "/auth/verify-request",
   },
-  debug: true,
+  debug: process.env.NODE_ENV === "development",
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ user, account, profile }) {
       try {
-        console.log("Tentative de connexion pour:", user.email);
-        // Vérifiez si l'email est celui de l'administrateur
-        if (user.email === "clynlouisin@gmail.com") {
-          user.role = "admin";
-        }
+        console.log("🔐 Nouvelle tentative de connexion pour:", {
+          email: user.email,
+          name: user.name,
+          image: user.image
+        });
+        
+        // Assurez-vous que l'utilisateur a un rôle par défaut
+        user.role = "user";
+        
         return true;
       } catch (error) {
-        console.error("Erreur lors de la connexion:", error);
+        console.error("❌ Erreur lors de la connexion:", error);
         return false;
       }
     },
     async session({ session, token }) {
-      try {
-        if (session?.user) {
-          session.user.id = token.sub;
-          // Assurez-vous que le rôle est correctement transmis
-          session.user.role = token.role as string || "user";
-          console.log("Session créée avec le rôle:", session.user.role);
-        }
-        return session;
-      } catch (error) {
-        console.error("Erreur lors de la création de la session:", error);
-        return session;
+      console.log("📝 Mise à jour de la session:", {
+        sessionBefore: session,
+        token
+      });
+
+      if (session.user) {
+        session.user.id = token.sub;
+        session.user.role = token.role as string || "user";
       }
+
+      console.log("✅ Session mise à jour:", session);
+      return session;
     },
-    async jwt({ token, user }) {
-      try {
-        if (user) {
-          // Conservez le rôle dans le token
-          token.role = user.role || "user";
-          console.log("JWT créé avec le rôle:", token.role);
-        }
-        return token;
-      } catch (error) {
-        console.error("Erreur lors de la création du JWT:", error);
-        return token;
+    async jwt({ token, user, account }) {
+      console.log("🔑 Génération du JWT:", {
+        tokenBefore: token,
+        user,
+        account
+      });
+
+      if (user) {
+        token.role = user.role || "user";
       }
+
+      console.log("✅ JWT généré:", token);
+      return token;
     },
     async redirect({ url, baseUrl }) {
       try {
-        console.log("Redirection vers:", url);
-        console.log("URL de base:", baseUrl);
+        console.log("🔄 Redirection:", {
+          url,
+          baseUrl
+        });
         
-        if (url.startsWith("/")) return `${baseUrl}${url}`;
-        if (url.startsWith(baseUrl)) return url;
+        // Toujours rediriger vers la page d'accueil après la connexion
+        if (url.startsWith(baseUrl)) {
+          return baseUrl;
+        }
         return baseUrl;
       } catch (error) {
-        console.error("Erreur lors de la redirection:", error);
+        console.error("❌ Erreur lors de la redirection:", error);
         return baseUrl;
       }
     },
   },
+  events: {
+    async signIn({ user }) {
+      console.log("✨ Événement signIn:", user);
+    },
+    async signOut({ token }) {
+      console.log("👋 Événement signOut:", token);
+    },
+    async session({ session, token }) {
+      console.log("🔄 Événement session:", { session, token });
+    }
+  }
 });
 
 export { handler as GET, handler as POST }; 

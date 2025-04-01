@@ -10,10 +10,10 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
+    --primary: 326 100% 60%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 258 90% 66%;
+    --secondary-foreground: 0 0% 98%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
     --accent: 240 4.8% 95.9%;
@@ -33,9 +33,9 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
+    --primary: 326 100% 60%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 258 90% 66%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
@@ -55,5 +55,98 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1, h2, h3, .font-futuristic {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0.025em;
+  }
+}
+
+@layer components {
+  .glassmorphism {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+  
+  .shadow-glow-primary {
+    box-shadow: 0 0 15px 2px hsl(var(--primary) / 0.5);
+  }
+  
+  .shadow-glow-secondary {
+    box-shadow: 0 0 15px 2px hsl(var(--secondary) / 0.5);
+  }
+
+  .card-3d {
+    transition: transform 0.5s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .card-3d:hover {
+    transform: translateY(-5px) rotateX(2deg) rotateY(2deg);
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04),
+      0 0 15px 2px hsl(var(--primary) / 0.3);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  }
+
+  .badge {
+    @apply inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full;
+  }
+
+  .badge-admin {
+    @apply badge bg-gradient-to-r from-primary to-secondary text-white shadow-glow-primary;
+  }
+
+  .badge-colab {
+    @apply badge bg-gradient-to-r from-blue-400 to-primary text-white;
+  }
+
+  /* Animation pour mobile */
+  @keyframes cardWobble {
+    0% { transform: translateY(0); }
+    25% { transform: translateY(-5px) rotateZ(-1deg); }
+    50% { transform: translateY(0) rotateZ(0deg); }
+    75% { transform: translateY(-2px) rotateZ(1deg); }
+    100% { transform: translateY(0); }
+  }
+
+  .card-animate-mobile {
+    animation: cardWobble 1.5s ease-in-out;
+  }
+  
+  /* Assurons que les textes sont toujours visibles */
+  .glassmorphism p {
+    @apply text-gray-800 dark:text-white;
+  }
+  
+  .glassmorphism h2, 
+  .glassmorphism h3, 
+  .glassmorphism h4 {
+    @apply text-gray-900 dark:text-white;
+  }
+  
+  /* Couleurs pour le texte sur fond blanc */
+  .text-on-light {
+    @apply text-gray-800;
+  }
+  
+  /* Couleurs pour le texte sur fond coloré */
+  .text-on-dark {
+    @apply text-white;
+  }
+  
+  /* Style pour les titres des sections */
+  .section-title {
+    @apply font-futuristic text-4xl font-bold mb-4 text-gray-800;
+  }
+  
+  /* Style pour les descriptions de sections */
+  .section-description {
+    @apply text-gray-700 max-w-2xl mx-auto;
   }
 }

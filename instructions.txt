@@ -24,11 +24,12 @@ Voici les pages essentielles à inclure et ce que tu devrais y mettre :
 1. Page d'accueil (Home)
 But : Faire une bonne première impression.
 Contenu :
-Un titre accrocheur (ex. : "Salut, moi c'est Charles, développeur web full stack passionné").
+Un titre accrocheur (ex. : "Salut, moi c'est Charles, développeur web full stack passionné"). et une photo de moi, que je pourrai chagner à souhait en tant qu'admin.
 Un court résumé de ton expertise et de ton objectif professionnel.
 Un bouton CTA (Call to Action) menant vers la section "Projets".
 Une image ou animation (par exemple un avatar, une photo pro, ou une animation sur ma photo avec Three.js).
-une section pour afficher les cartes de mes diffrents collaborateurs, avec la Possibilité de laisser un like sur celui ci et un message(le message renvoi à la page de messagerie qui n'est accessible qu'une fois inscrit)
+une section pour afficher les cartes de mes diffrents collaborateurs, avec la Possibilité de laisser un like sur celui ci et un message(le message renvoi à la page de messagerie qui n'est accessible qu'une fois inscrit).
+si inscrit il sera renvoye vers la page de messages ou le like sera mis mais s'il n'est pas inscrit un toast error disant "vous devez vous connecter pour liker un collaborateur".
 une section pour les avis des utilisateurs(il faut etre connecte pour laisser un avis), il peut laisser un avis sur un colab en particulier ou sur l'admin(avis qui s'affichera sur la page d'accueil mais aussi dans le profil des deux utilisateurs) ou laisser un avis sur l'application en generale.
 un footer
 ---

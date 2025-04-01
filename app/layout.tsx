@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import RootLayoutClient from "./components/RootLayoutClient";
+import "@fontsource/orbitron/400.css";
+import "@fontsource/orbitron/700.css";
+import RootLayoutClient from "./RootLayoutClient";
 
 const inter = Inter({ subsets: ["latin"] });
 
