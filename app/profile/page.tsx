@@ -16,7 +16,7 @@ import Link from "next/link";
 import { Id } from "@/convex/_generated/dataModel";
 
 export default function ProfilePage() {
-  const { user } = useUser();
+  const { user, session, isLoading } = useUser();
   const userStats = useQuery(api.users.getCollaborators, user ? { userId: user._id as Id<"users"> } : "skip");
   const savedPosts = useQuery(api.posts.getSavedPosts, user ? { userId: user._id as Id<"users"> } : "skip");
   const savedBlogs = useQuery(api.blogs.getSavedBlogs, user ? { userId: user._id as Id<"users"> } : "skip");
@@ -62,13 +62,35 @@ export default function ProfilePage() {
     }
   };
 
-  if (!user) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
     return (
       <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Connectez-vous pour accéder à votre profil</h1>
-          <Link href="/sign-in">
+          <Link href="/auth/signin">
             <Button>Se connecter</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Profil non trouvé</h1>
+          <p>Nous n'avons pas pu trouver votre profil. Veuillez vous reconnecter.</p>
+          <Link href="/auth/signin">
+            <Button className="mt-4">Se reconnecter</Button>
           </Link>
         </div>
       </div>

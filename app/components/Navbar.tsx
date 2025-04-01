@@ -10,6 +10,8 @@ import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { useState } from "react";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { useRouter } from "next/navigation";
 
 const routes = [
   {
@@ -63,6 +65,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const { user, session } = useUser();
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   const isAdmin = session?.user.role === "admin";
   const isAuthenticated = session;
@@ -132,7 +135,7 @@ const Navbar = () => {
       <div className="flex items-center gap-4">
         {!isAuthenticated && (
           <Button 
-            onClick={() => signIn("google")}
+            onClick={() => router.push("/auth/signin")}
             className="bg-primary hover:bg-primary/90 text-white shadow-sm"
           >
             Se connecter
@@ -140,14 +143,18 @@ const Navbar = () => {
         )}
         {isAuthenticated && (
           <div className="flex items-center gap-4">
-            <Image
-              src={user?.imageUrl || "/default-avatar.png"}
-              alt="Profile"
-              width={50}
-              height={50}
-              className="rounded-full cursor-pointer size-12 object-cover border-2 border-white/50"
-              onClick={() => signOut()}
-            />
+            <Link href="/profile">
+              <Avatar className="cursor-pointer hover:opacity-80 transition">
+                <AvatarImage src={user?.imageUrl || "/images/default-avatar.png"} alt="Profile" />
+                <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+            </Link>
+            <Button 
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="hidden md:block"
+            >
+              Déconnexion
+            </Button>
           </div>
         )}
       </div>

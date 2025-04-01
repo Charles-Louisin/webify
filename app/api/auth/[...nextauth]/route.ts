@@ -1,5 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "@/convex/_generated/api";
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 declare module "next-auth" {
   interface Session {
@@ -22,6 +27,45 @@ const handler = NextAuth({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Mot de passe", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email et mot de passe requis");
+        }
+
+        try {
+          // Vérifier si l'utilisateur existe
+          const user = await convex.query(api.users.getUserByEmail, {
+            email: credentials.email
+          });
+
+          if (!user) {
+            throw new Error("Utilisateur non trouvé");
+          }
+
+          // Vérifier le mot de passe
+          if (user.password !== credentials.password) {
+            throw new Error("Mot de passe incorrect");
+          }
+
+          return {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            image: user.imageUrl,
+            role: user.role
+          };
+        } catch (error) {
+          console.error("Erreur d'authentification:", error);
+          throw error;
+        }
+      }
+    })
   ],
   session: {
     strategy: "jwt",
@@ -36,72 +80,61 @@ const handler = NextAuth({
   },
   debug: process.env.NODE_ENV === "development",
   callbacks: {
-    async signIn({ user, account, profile }) {
-      try {
-        console.log("🔐 Nouvelle tentative de connexion pour:", {
-          email: user.email,
-          name: user.name,
-          image: user.image
-        });
-        
-        // Assurez-vous que l'utilisateur a un rôle par défaut
-        user.role = "user";
-        
-        return true;
-      } catch (error) {
-        console.error("❌ Erreur lors de la connexion:", error);
-        return false;
-      }
-    },
-    async session({ session, token }) {
-      console.log("📝 Mise à jour de la session:", {
-        sessionBefore: session,
-        token
-      });
-
-      if (session.user) {
-        session.user.id = token.sub;
-        session.user.role = token.role as string || "user";
-      }
-
-      console.log("✅ Session mise à jour:", session);
-      return session;
-    },
-    async jwt({ token, user, account }) {
-      console.log("🔑 Génération du JWT:", {
-        tokenBefore: token,
-        user,
-        account
-      });
-
+    async jwt({ token, user }) {
       if (user) {
-        token.role = user.role || "user";
+        token.id = user.id;
+        token.email = user.email;
+        token.sub = user.email;
       }
-
-      console.log("✅ JWT généré:", token);
       return token;
     },
-    async redirect({ url, baseUrl }) {
-      try {
-        console.log("🔄 Redirection:", {
-          url,
-          baseUrl
-        });
-        
-        // Toujours rediriger vers la page d'accueil après la connexion
-        if (url.startsWith(baseUrl)) {
-          return baseUrl;
-        }
-        return baseUrl;
-      } catch (error) {
-        console.error("❌ Erreur lors de la redirection:", error);
-        return baseUrl;
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
       }
-    },
+      return session;
+    }
   },
   events: {
     async signIn({ user }) {
       console.log("✨ Événement signIn:", user);
+      
+      if (user.email) {
+        try {
+          // Vérifier si l'utilisateur existe
+          const existingUser = await convex.query(api.users.getUserByEmail, {
+            email: user.email
+          });
+
+          console.log("Utilisateur existant:", existingUser);
+
+          if (!existingUser) {
+            // Créer l'utilisateur s'il n'existe pas
+            const newUser = await convex.mutation(api.auth.createUser, {
+              name: user.name || "",
+              email: user.email,
+              image: user.image || undefined,
+              password: "", // Champ requis par le schéma
+              role: "user",
+              userId: user.email,
+              stats: {
+                projectsCreated: 0,
+                projectsLiked: 0,
+                postsCreated: 0,
+                postsLiked: 0,
+                commentsCreated: 0,
+                commentsLiked: 0,
+                likedBy: [],
+                online: false,
+              },
+            });
+            console.log("✅ Nouvel utilisateur créé:", newUser);
+          }
+        } catch (error) {
+          console.error("❌ Erreur lors de la création de l'utilisateur:", error);
+        }
+      }
     },
     async signOut({ token }) {
       console.log("👋 Événement signOut:", token);

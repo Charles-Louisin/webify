@@ -41,33 +41,32 @@ export const add = mutation({
     targetId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    console.log("Identity received:", identity);
-    
-    if (!identity) {
-      console.log("No identity found");
-      throw new Error("Not authenticated");
-    }
+    console.log("Tentative d'ajout d'avis avec:", args);
 
-    const tokenIdentity = JSON.parse(identity.tokenIdentifier);
-    console.log("Token identity:", tokenIdentity);
+    const identity = await ctx.auth.getUserIdentity();
+    console.log("Identity reçue:", identity);
+
+    if (!identity?.email) {
+      console.log("Pas d'email trouvé dans l'identité");
+      throw new Error("Non authentifié");
+    }
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), tokenIdentity.email))
-      .first();
+      .withIndex("by_email", (q) => q.eq("email", identity.email as string))
+      .unique();
 
-    console.log("User found:", user);
+    console.log("Utilisateur trouvé:", user);
 
     if (!user) {
-      console.log("No user found for email:", tokenIdentity.email);
-      throw new Error("User not found");
+      console.log("Aucun utilisateur trouvé pour l'email:", identity.email);
+      throw new Error("Utilisateur non trouvé");
     }
 
     const review = await ctx.db.insert("reviews", {
       userId: user._id,
-      userName: user.name || tokenIdentity.name || "Anonyme",
-      userImage: user.imageUrl || tokenIdentity.image || "",
+      userName: user.name,
+      userImage: user.imageUrl || "",
       content: args.content,
       rating: args.rating,
       targetId: args.targetId,
@@ -75,7 +74,7 @@ export const add = mutation({
       isAppReview: args.targetType === "app",
     });
 
-    console.log("Review created:", review);
+    console.log("Avis créé avec succès:", review);
     return review;
   },
 });

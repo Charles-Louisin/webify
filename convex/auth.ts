@@ -12,20 +12,6 @@ export const createUser = mutation({
   handler: async (ctx, args) => {
     console.log("🚀 Début de createUser avec:", args);
 
-    // Vérifier l'authentification
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      console.error("❌ Tentative de création d'utilisateur sans authentification");
-      throw new Error("Non authentifié");
-    }
-
-    // Vérifier que l'email correspond à l'utilisateur authentifié
-    const tokenIdentity = JSON.parse(identity.tokenIdentifier);
-    if (tokenIdentity.email !== args.email) {
-      console.error("❌ L'email ne correspond pas à l'utilisateur authentifié");
-      throw new Error("Email non autorisé");
-    }
-
     try {
       // Vérifier si l'utilisateur existe déjà
       const existingUser = await ctx.db
@@ -47,6 +33,7 @@ export const createUser = mutation({
         role: "user",
         imageUrl: args.image,
         userId: args.email,
+        password: "",
         stats: {
           projectsCreated: 0,
           projectsLiked: 0,
@@ -170,4 +157,54 @@ export const checkIsAdmin = async (ctx: any, userId: Id<"users">) => {
     throw new Error("Permission refusée - Action réservée aux administrateurs");
   }
   return user;
-}; 
+};
+
+export const registerUser = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    password: v.string(),
+  },
+  handler: async (ctx, args) => {
+    console.log("🚀 Début de registerUser avec:", args);
+
+    try {
+      // Vérifier si l'utilisateur existe déjà
+      const existingUser = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.email))
+        .unique();
+
+      if (existingUser) {
+        throw new Error("Cet email est déjà utilisé");
+      }
+
+      // Créer un nouvel utilisateur avec le rôle "user" par défaut
+      const newUser = {
+        name: args.name,
+        email: args.email,
+        password: args.password,
+        role: "user",
+        imageUrl: undefined,
+        userId: args.email,
+        stats: {
+          projectsCreated: 0,
+          projectsLiked: 0,
+          postsCreated: 0,
+          postsLiked: 0,
+          commentsCreated: 0,
+          commentsLiked: 0,
+          likedBy: [],
+          online: false,
+        },
+      };
+
+      const userId = await ctx.db.insert("users", newUser);
+      console.log("✨ Nouvel utilisateur créé avec succès, ID:", userId);
+      return userId;
+    } catch (error) {
+      console.error("❌ Erreur lors de la création de l'utilisateur:", error);
+      throw error;
+    }
+  },
+}); 

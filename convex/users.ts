@@ -60,13 +60,6 @@ export const getCurrentUser = query({
   handler: async (ctx, args) => {
     console.log("🔍 getCurrentUser appelé avec userId:", args.userId);
     
-    // Vérifier l'authentification
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      console.log("❌ Utilisateur non authentifié");
-      return null;
-    }
-
     try {
       const user = await ctx.db
         .query("users")
@@ -82,7 +75,7 @@ export const getCurrentUser = query({
       return user;
     } catch (error) {
       console.error("❌ Erreur dans getCurrentUser:", error);
-      throw new Error("Erreur lors de la récupération de l'utilisateur");
+      return null;
     }
   },
 });
@@ -139,5 +132,30 @@ export const updateOnlineStatus = mutation({
     });
 
     return true;
+  },
+});
+
+export const getUserByEmail = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    console.log("🔍 getUserByEmail appelé avec email:", args.email);
+    
+    try {
+      const user = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", args.email))
+        .unique();
+
+      if (!user) {
+        console.log("❌ Aucun utilisateur trouvé pour l'email:", args.email);
+        return null;
+      }
+
+      console.log("✅ Utilisateur trouvé:", user);
+      return user;
+    } catch (error) {
+      console.error("❌ Erreur dans getUserByEmail:", error);
+      return null;
+    }
   },
 }); 
