@@ -10,7 +10,6 @@ import { useUser } from "@/app/hooks/useUser";
 import { useState, useEffect } from "react";
 import CollaboratorCard from "./CollaboratorCard";
 import { useMediaQuery } from "@/app/hooks/useMediaQuery";
-import CollaborateSection from "./CollaborateSection";
 
 interface Collaborator {
   _id: Id<"users">;

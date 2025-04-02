@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
@@ -10,7 +11,7 @@ import { Label } from "@/app/components/ui/label";
 import { toast } from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 
-export default function SignIn() {
+function SignInContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({
@@ -165,6 +166,27 @@ export default function SignIn() {
                 {isLoading ? "Connexion..." : "Se connecter"}
               </Button>
             </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Ou continuer avec
+                </span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() => signIn("google", { callbackUrl: "/" })}
+              disabled={isLoading}
+            >
+              <FcGoogle className="mr-2 h-4 w-4" />
+              Google
+            </Button>
           </TabsContent>
 
           <TabsContent value="register" className="space-y-4">
@@ -202,9 +224,9 @@ export default function SignIn() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="register-confirm-password">Confirmer le mot de passe</Label>
+                <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
                 <Input
-                  id="register-confirm-password"
+                  id="confirm-password"
                   type="password"
                   placeholder="••••••••"
                   value={registerData.confirmPassword}
@@ -218,30 +240,21 @@ export default function SignIn() {
             </form>
           </TabsContent>
         </Tabs>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              Ou continuer avec
-            </span>
-          </div>
-        </div>
-
-        <Button
-          className="w-full"
-          onClick={() => signIn("google", { 
-            callbackUrl: "/",
-            redirect: true
-          })}
-          disabled={isLoading}
-        >
-          <FcGoogle className="mr-2 h-5 w-5" />
-          Google
-        </Button>
       </div>
     </div>
+  );
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="w-full max-w-md p-8 text-center">
+          Chargement...
+        </div>
+      </div>
+    }>
+      <SignInContent />
+    </Suspense>
   );
 } 

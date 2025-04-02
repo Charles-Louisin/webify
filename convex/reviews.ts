@@ -89,3 +89,28 @@ export const add = mutation({
     return review;
   },
 });
+
+export const fixMissingTargetName = mutation({
+  args: {},
+  handler: async (ctx) => {
+    console.log("Début de la correction des avis sans targetName");
+    
+    const reviews = await ctx.db
+      .query("reviews")
+      .collect();
+    
+    console.log(`${reviews.length} avis trouvés`);
+    
+    for (const review of reviews) {
+      if (!review.targetName) {
+        console.log(`Correction de l'avis ${review._id}`);
+        await ctx.db.patch(review._id, {
+          targetName: review.isAppReview ? "Webify" : "Utilisateur"
+        });
+      }
+    }
+    
+    console.log("Correction terminée");
+    return { success: true };
+  },
+});

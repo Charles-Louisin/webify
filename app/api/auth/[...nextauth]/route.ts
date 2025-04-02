@@ -83,8 +83,8 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
-        token.sub = user.email;
+        token.email = user.email || undefined;
+        token.sub = user.email || undefined;
         token.role = user.role;
       }
       return token;
@@ -119,7 +119,7 @@ const handler = NextAuth({
             await convex.mutation(api.auth.createUser, {
               name: user.name || "",
               email: user.email,
-              image: user.image,
+              image: user.image || undefined,
             });
           }
         } catch (error) {
