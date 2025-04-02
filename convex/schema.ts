@@ -126,6 +126,7 @@ export default defineSchema({
     content: v.string(),
     rating: v.number(),
     targetId: v.optional(v.string()),
+    targetName: v.string(),
     createdAt: v.string(),
     isAppReview: v.boolean(),
   })

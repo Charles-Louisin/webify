@@ -7,6 +7,7 @@ export const createReview = mutation({
   args: {
     authorId: v.id("users"),
     targetId: v.optional(v.id("users")),
+    targetName: v.string(),
     content: v.string(),
     rating: v.number(),
     isAppReview: v.boolean(),
@@ -43,6 +44,7 @@ export const createReview = mutation({
       content: args.content,
       rating: args.rating,
       targetId: args.targetId,
+      targetName: args.targetName,
       createdAt: new Date().toISOString(),
       isAppReview: args.isAppReview,
     });

@@ -45,10 +45,30 @@ export default function SignIn() {
       });
 
       if (result?.error) {
-        toast.error("Erreur de connexion. Vérifiez vos identifiants.");
+        toast.error("Erreur de connexion. Vérifiez vos identifiants.", {
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        });
+      } else {
+        toast.success("Vous êtes connecté !", {
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        });
       }
     } catch (error) {
-      toast.error("Une erreur est survenue");
+      toast.error("Une erreur est survenue", {
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
     } finally {
       setIsLoading(false);
     }

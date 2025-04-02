@@ -90,12 +90,24 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
     e.preventDefault();
     
     if (!session || !user) {
-      toast.error("Vous devez être connecté pour laisser un avis");
+      toast.error("Vous devez être connecté pour laisser un avis", {
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
       return;
     }
     
     if (newReview.content.trim().length < 10) {
-      toast.error("Votre avis doit contenir au moins 10 caractères");
+      toast.error("Votre avis doit contenir au moins 10 caractères", {
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
       return;
     }
     
@@ -104,6 +116,7 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
         content: newReview.content,
         rating: newReview.rating,
         targetType,
+        targetName: targetType === "app" ? "Webify" : user?.name || "Admin",
         session: {
           user: {
             email: session.user.email!,
@@ -114,12 +127,28 @@ export default function ReviewsSection({ reviews }: ReviewsSectionProps) {
       });
       
       if (result) {
-        toast.success("Avis ajouté avec succès !");
+        const successMessage = `${user?.name}, **Webify** vous remercie de votre avis !`;
+        
+        toast.success(successMessage, {
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+          duration: 3000,
+        });
+        
         setNewReview({ content: "", rating: 5 });
         setShowForm(false);
       }
     } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue lors de l'ajout de votre avis");
+      toast.error(error.message || "Une erreur est survenue lors de l'ajout de votre avis", {
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
     }
   };
 

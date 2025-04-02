@@ -3,6 +3,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import HeroSection from "./components/home/HeroSection";
+import AboutMeSection from "./components/home/AboutMeSection";
 import CollaboratorsSection from "./components/home/CollaboratorsSection";
 import ReviewsSection from "./components/home/ReviewsSection";
 import { motion } from "framer-motion";
@@ -32,6 +33,8 @@ export default function Home() {
   return (
     <div className="min-h-screen pt-16 overflow-hidden">
       <HeroSection />
+      
+      <AboutMeSection />
 
       <motion.div
         ref={collaboratorsRef}

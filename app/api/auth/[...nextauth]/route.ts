@@ -85,6 +85,7 @@ const handler = NextAuth({
         token.id = user.id;
         token.email = user.email;
         token.sub = user.email;
+        token.role = user.role;
       }
       return token;
     },
@@ -92,6 +93,7 @@ const handler = NextAuth({
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
+        session.user.role = token.role as string;
       }
       return session;
     }
@@ -109,44 +111,21 @@ const handler = NextAuth({
 
           console.log("Utilisateur existant:", existingUser);
 
-          if (!existingUser) {
-            // Vérifier si l'utilisateur a été supprimé
-            const deletedUser = await convex.query(api.users.getDeletedUserByEmail, {
-              email: user.email
-            });
-
-            if (deletedUser) {
-              console.log("❌ Utilisateur précédemment supprimé, redirection vers l'inscription");
-              return false; // Cela redirigera vers /auth/signin avec une erreur
-            }
-
-            // Créer l'utilisateur s'il n'a jamais existé
-            const newUser = await convex.mutation(api.auth.createUser, {
+          if (existingUser) {
+            // Mettre à jour le rôle de l'utilisateur dans la session
+            user.role = existingUser.role;
+          } else {
+            // Créer un nouvel utilisateur
+            await convex.mutation(api.auth.createUser, {
               name: user.name || "",
               email: user.email,
-              image: user.image || undefined,
-              password: "", // Champ requis par le schéma
-              role: "user",
-              userId: user.email,
-              stats: {
-                projectsCreated: 0,
-                projectsLiked: 0,
-                postsCreated: 0,
-                postsLiked: 0,
-                commentsCreated: 0,
-                commentsLiked: 0,
-                likedBy: [],
-                online: false,
-              },
+              image: user.image,
             });
-            console.log("✅ Nouvel utilisateur créé:", newUser);
           }
         } catch (error) {
-          console.error("❌ Erreur lors de la création/vérification de l'utilisateur:", error);
-          return false; // Rediriger vers la page de connexion en cas d'erreur
+          console.error("❌ Erreur lors de la gestion de l'utilisateur:", error);
         }
       }
-      return true; // Autoriser la connexion dans les autres cas
     },
     async signOut({ token }) {
       console.log("👋 Événement signOut:", token);

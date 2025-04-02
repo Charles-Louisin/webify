@@ -169,4 +169,51 @@ export const getDeletedUserByEmail = query({
       .first();
     return user === null;
   },
+});
+
+export const getAdminProfile = query({
+  args: {},
+  handler: async (ctx) => {
+    const admin = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("role"), "admin"))
+      .first();
+
+    if (!admin) return null;
+
+    return {
+      _id: admin._id,
+      name: admin.name,
+      email: admin.email,
+      imageUrl: admin.imageUrl,
+      title: admin.title || "Salut, moi c'est Charles",
+      bio: admin.bio || "Développeur web full stack passionné, je crée des expériences numériques innovantes et intuitives. Spécialisé dans les technologies modernes, je m'efforce de combiner créativité et performance pour donner vie à vos projets.",
+      skills: admin.skills || ["React", "Next.js", "Node.js", "TypeScript", "Tailwind CSS"],
+    };
+  },
+});
+
+export const updateAdminProfile = mutation({
+  args: {
+    adminId: v.id("users"),
+    title: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    skills: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.adminId);
+    if (!user || user.role !== "admin") {
+      throw new Error("Non autorisé");
+    }
+
+    const updates: any = {};
+    if (args.title !== undefined) updates.title = args.title;
+    if (args.bio !== undefined) updates.bio = args.bio;
+    if (args.imageUrl !== undefined) updates.imageUrl = args.imageUrl;
+    if (args.skills !== undefined) updates.skills = args.skills;
+
+    await ctx.db.patch(args.adminId, updates);
+    return true;
+  },
 }); 

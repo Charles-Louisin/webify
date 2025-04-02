@@ -19,6 +19,7 @@ export const create = mutation({
     content: v.string(),
     rating: v.number(),
     targetId: v.optional(v.string()),
+    targetName: v.string(),
     userId: v.string(),
     userName: v.string(),
     userImage: v.string(),
@@ -39,6 +40,7 @@ export const add = mutation({
     rating: v.number(),
     targetType: v.string(),
     targetId: v.optional(v.string()),
+    targetName: v.string(),
     session: v.object({
       user: v.object({
         email: v.string(),
@@ -78,6 +80,7 @@ export const add = mutation({
       content: args.content,
       rating: args.rating,
       targetId: args.targetId,
+      targetName: args.targetName,
       createdAt: new Date().toISOString(),
       isAppReview: isAppReview
     });
